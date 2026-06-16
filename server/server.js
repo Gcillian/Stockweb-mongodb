@@ -14,11 +14,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
+// MongoDB Connection with retry
 const MONGO = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/nusatrade';
-mongoose.connect(MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('✓ MongoDB connected'))
-  .catch(err => console.error('✗ MongoDB error:', err));
+
+const connectWithRetry = (attempt = 1) => {
+  mongoose.connect(MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('✓ MongoDB connected'))
+    .catch(err => {
+      console.error(`✗ MongoDB error (attempt ${attempt}):`, err.message);
+      const delay = Math.min(attempt * 5000, 30000);
+      console.log(`  Retrying in ${delay / 1000}s...`);
+      setTimeout(() => connectWithRetry(attempt + 1), delay);
+    });
+};
+
+connectWithRetry();
 
 // Routes
 app.use('/api', authRoutes);
