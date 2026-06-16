@@ -1,0 +1,619 @@
+﻿<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NusaTrade | Premium Trader Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;family=Geist:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(22, 22, 22, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .trading-grid-lines {
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#e5e2e1",
+                      "primary-fixed": "#6ffbbe",
+                      "on-tertiary": "#002e6a",
+                      "on-tertiary-container": "#00367a",
+                      "primary": "#4edea3",
+                      "tertiary-fixed": "#d8e2ff",
+                      "outline-variant": "#3c4a42",
+                      "on-tertiary-fixed": "#001a42",
+                      "on-surface-variant": "#bbcabf",
+                      "error": "#ffb4ab",
+                      "surface-tint": "#4edea3",
+                      "secondary-container": "#a40217",
+                      "on-tertiary-fixed-variant": "#004395",
+                      "tertiary-container": "#71a1ff",
+                      "inverse-on-surface": "#313030",
+                      "surface-container-high": "#2a2a2a",
+                      "on-primary": "#003824",
+                      "on-error": "#690005",
+                      "primary-container": "#10b981",
+                      "on-primary-fixed": "#002113",
+                      "background": "#131313",
+                      "surface-variant": "#353534",
+                      "on-background": "#e5e2e1",
+                      "secondary-fixed-dim": "#ffb3ad",
+                      "on-error-container": "#ffdad6",
+                      "outline": "#86948a",
+                      "on-primary-fixed-variant": "#005236",
+                      "on-primary-container": "#00422b",
+                      "surface-dim": "#131313",
+                      "tertiary-fixed-dim": "#adc6ff",
+                      "secondary": "#ffb3ad",
+                      "surface": "#131313",
+                      "on-secondary-fixed": "#410004",
+                      "on-secondary-container": "#ffaea8",
+                      "tertiary": "#adc6ff",
+                      "on-secondary-fixed-variant": "#930013",
+                      "inverse-surface": "#e5e2e1",
+                      "inverse-primary": "#006c49",
+                      "error-container": "#93000a",
+                      "secondary-fixed": "#ffdad7",
+                      "surface-container": "#201f1f",
+                      "on-secondary": "#68000a",
+                      "surface-container-highest": "#353534",
+                      "surface-container-low": "#1c1b1b",
+                      "primary-fixed-dim": "#4edea3",
+                      "surface-bright": "#3a3939",
+                      "surface-container-lowest": "#0e0e0e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "2rem",
+                      "md": "1.5rem",
+                      "xs": "0.5rem",
+                      "sm": "1rem",
+                      "xl": "3rem",
+                      "gutter": "1.5rem",
+                      "base": "4px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Inter"],
+                      "data-tabular": ["JetBrains Mono"],
+                      "display-lg": ["Geist"],
+                      "headline-md": ["Geist"],
+                      "headline-lg": ["Geist"],
+                      "body-md": ["Inter"],
+                      "headline-lg-mobile": ["Geist"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "data-tabular": ["14px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                      "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- SideNavBar -->
+<aside class="fixed h-full left-0 top-0 z-40 flex flex-col py-6 px-4 bg-surface dark:bg-surface border-r border-white/10 backdrop-blur-xl h-screen w-64">
+<div class="mb-10 px-2">
+<h1 class="text-headline-md font-headline-md font-bold text-primary dark:text-primary">NusaTrade</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant/60">Premium Trader</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a data-menu="dashboard" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'dashboard')" class="menu-link flex items-center gap-3 px-4 py-3 transition-colors duration-200 ease-in-out text-primary font-bold border-r-2 border-primary hover:bg-primary/10 cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a data-menu="markets" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'markets')" class="menu-link flex items-center gap-3 px-4 py-3 transition-colors duration-200 ease-in-out text-on-surface-variant font-body-md hover:bg-primary/10 hover:text-primary-fixed cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="show_chart">show_chart</span>
+<span class="font-body-md text-body-md">Pasar Saham</span>
+</a>
+<a data-menu="watchlist" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'watchlist')" class="menu-link flex items-center gap-3 px-4 py-3 transition-colors duration-200 ease-in-out text-on-surface-variant font-body-md hover:bg-primary/10 hover:text-primary-fixed cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="star">star</span>
+<span class="font-body-md text-body-md">Watchlist</span>
+</a>
+<a data-menu="portfolio" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'portfolio')" class="menu-link flex items-center gap-3 px-4 py-3 transition-colors duration-200 ease-in-out text-on-surface-variant font-body-md hover:bg-primary/10 hover:text-primary-fixed cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-body-md text-body-md">Portfolio</span>
+</a>
+<a data-menu="history" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'history')" class="menu-link flex items-center gap-3 px-4 py-3 transition-colors duration-200 ease-in-out text-on-surface-variant font-body-md hover:bg-primary/10 hover:text-primary-fixed cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-body-md text-body-md">Riwayat</span>
+</a>
+<a data-menu="settings" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'settings')" class="menu-link flex items-center gap-3 px-4 py-3 transition-colors duration-200 ease-in-out text-on-surface-variant font-body-md hover:bg-primary/10 hover:text-primary-fixed cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Setelan</span>
+</a>
+</nav>
+<div class="mt-auto px-2 space-y-6">
+<button id="depositBtn" class="w-full py-3 px-4 bg-primary text-on-primary font-bold rounded-lg shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-transform cursor-pointer">
+                Deposit Saldo
+            </button>
+<div class="space-y-1">
+<a data-menu="help" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'help')" class="menu-link flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+<span class="text-label-sm">Bantuan</span>
+</a>
+<a id="logoutBtn" class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-error transition-colors cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span>
+<span class="text-label-sm">Keluar</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-64 z-30 flex justify-between items-center px-gutter h-16 bg-surface/80 dark:bg-surface/80 border-b border-white/10 backdrop-blur-md">
+<div class="flex items-center gap-8">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant material-symbols-outlined text-[20px]">search</span>
+<input class="bg-surface-container-lowest border-none rounded-full pl-10 pr-4 py-1.5 text-label-sm w-64 focus:ring-1 focus:ring-primary transition-all" placeholder="Cari emiten (e.g. BBCA)" type="text"/>
+</div>
+<div class="flex gap-4">
+<span class="text-label-sm font-label-sm flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                    Market: Open
+                </span>
+<span class="text-label-sm font-label-sm text-primary">
+                    IHSG: 7,205.12 (+0.45%)
+                </span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-end">
+<span id="balanceValue" class="text-label-sm font-bold text-on-surface">IDR 125.450.000</span>
+<span class="text-[10px] font-bold text-primary">+12.4% P/L</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-white/5" data-icon="notifications">notifications</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-primary/30">
+<img alt="User avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBulFYV70EI-C2jVdZaovmD3e7jMhVt-9AHpUBfe5OZlFv7b_b6vUkSUgU_2OhTqwQS1Xlo7yWGXmkl_WDe-JwAogKUtJk6UK6jSsUzm3R3DOjMiNn8RKwQMzj_bf9M6bYGTVqzGeS8xKuXTs9rCapCIJ9SQ31HlYuSdODcDYiWlslEIQVqU5buSBXTavmEWDBd_mhqcq6yRqx2NtUMYRdFqvgIecXuSFfofD90q1EcUR43EVARvmE6-nQJlBtuhCPwAxBshpBcHin3"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 mt-16 p-gutter min-h-screen">
+<!-- Dashboard Section -->
+<div id="dashboardSection" class="section-content">
+<!-- Portfolio Summary -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+<div class="glass-card p-5 rounded-xl">
+<p class="text-on-surface-variant text-label-sm mb-1">Total Saldo</p>
+<h3 id="totalBalanceValue" class="text-headline-md font-headline-md font-bold">Rp 24.500.000</h3>
+<div class="mt-4 flex items-center text-primary gap-1">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+<span class="text-label-sm">+Rp 120.000 (Today)</span>
+</div>
+</div>
+<div class="glass-card p-5 rounded-xl">
+<p class="text-on-surface-variant text-label-sm mb-1">Total Aset</p>
+<h3 id="totalAssetValue" class="text-headline-md font-headline-md font-bold">Rp 125.450.000</h3>
+<div class="mt-4 flex items-center text-primary gap-1">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span class="text-label-sm">12 Emiten Aktif</span>
+</div>
+</div>
+<div class="glass-card p-5 rounded-xl border-primary/20">
+<p class="text-on-surface-variant text-label-sm mb-1">Profit/Loss Hari Ini</p>
+<h3 class="text-headline-md font-headline-md font-bold text-primary">+2.45%</h3>
+<div class="mt-4 flex items-center text-primary gap-1">
+<span class="material-symbols-outlined text-[16px]">payments</span>
+<span class="text-label-sm">+Rp 3.075.000</span>
+</div>
+</div>
+<div class="glass-card p-5 rounded-xl">
+<p class="text-on-surface-variant text-label-sm mb-1">Total Investasi</p>
+<h3 id="totalInvestValue" class="text-headline-md font-headline-md font-bold">Rp 100.950.000</h3>
+<div class="mt-4 flex items-center text-on-surface-variant/60 gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-label-sm">Terakhir update: 14:30</span>
+</div>
+</div>
+</section>
+<section class="glass-card rounded-xl p-5 mb-8">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-headline-md text-[20px]">Portofolio Anda</h3>
+<span class="text-label-sm text-on-surface-variant">Tampilan real-time</span>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left text-label-sm">
+<thead class="text-on-surface-variant text-[10px] uppercase tracking-[0.08em]">
+<tr>
+<th class="px-4 py-3">Saham</th>
+<th class="px-4 py-3">Kuantitas</th>
+<th class="px-4 py-3">Harga</th>
+<th class="px-4 py-3">Nilai</th>
+</tr>
+</thead>
+<tbody id="portfolioTableBody" class="divide-y divide-white/5 font-data-tabular"></tbody>
+</table>
+</div>
+</section>
+<!-- Central Trading Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+<!-- Main Chart Area -->
+<div class="lg:col-span-8 glass-card rounded-xl overflow-hidden flex flex-col">
+<div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/2">
+<div class="flex items-center gap-4">
+<div>
+<span id="chartStockCode" class="text-body-lg font-bold">BBCA</span>
+<span id="chartStockName" class="text-on-surface-variant text-label-sm ml-2">Bank Central Asia Tbk.</span>
+</div>
+<div class="flex bg-surface-container rounded-lg p-0.5">
+<button class="px-3 py-1 text-[11px] font-bold rounded bg-primary text-on-primary">1D</button>
+<button class="px-3 py-1 text-[11px] font-bold rounded hover:bg-white/5">1W</button>
+<button class="px-3 py-1 text-[11px] font-bold rounded hover:bg-white/5">1M</button>
+<button class="px-3 py-1 text-[11px] font-bold rounded hover:bg-white/5">1Y</button>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<p class="text-headline-md font-bold text-primary">10.225</p>
+<p class="text-[10px] text-primary">+150 (1.49%)</p>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant" data-icon="fullscreen">fullscreen</button>
+</div>
+</div>
+<!-- Chart Visualization (Simulated with Gradient/Canvas) -->
+<div class="flex-1 min-h-[400px] relative trading-grid-lines p-4">
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<img class="w-full h-full object-cover filter grayscale invert contrast-125" data-alt="A sophisticated dark-mode financial candlestick chart showing multiple indicators, green and red bars, and a pulsing trend line in emerald green. The aesthetic is clean, high-density, and technical, representing high-frequency professional trading software. Minimalist grid lines and glowing data points create a sense of advanced technology." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_rHAv-gOLCzP_1xNYvlA_ZKytcQCALvYwpx8y2ImjtnWewVZiIt1ErY8xr5DDq9WjrhTFWV-GajhQD_pWVqAah95B3YXg6O8JoPa7TdXksLsndJkAxnIqTfmM-qH0x3_pglPlauvNw2x7iTw7anIvIh1GqFs2Flordr7k1dc_XrqnP5noVHbBkpdh2ZeMNEAazCIQ98VvDPE7IlQe9N3g4vgwn-fCasiXLSPfDWnLslAtPj3E7ANg51o7-jgeHHPoFns4_V3P0HdT"/>
+</div>
+<!-- Simulated Candlestick Overlays -->
+<div class="relative z-10 w-full h-full flex items-end gap-1 overflow-hidden pt-10">
+<!-- Simplified representation of candles -->
+<div class="flex-1 flex flex-col justify-end gap-0.5">
+<div class="w-full bg-primary/20 h-24 rounded-sm border border-primary/40"></div>
+<div class="w-full bg-primary/40 h-12"></div>
+</div>
+<div class="flex-1 flex flex-col justify-end gap-0.5">
+<div class="w-full bg-primary/20 h-32 rounded-sm border border-primary/40"></div>
+<div class="w-full bg-primary/40 h-8"></div>
+</div>
+<div class="flex-1 flex flex-col justify-end gap-0.5">
+<div class="w-full bg-error/20 h-28 rounded-sm border border-error/40"></div>
+<div class="w-full bg-error/40 h-16"></div>
+</div>
+<!-- Repeat similar for visual density -->
+<div class="flex-1 flex flex-col justify-end gap-0.5 hidden sm:flex">
+<div class="w-full bg-primary/20 h-40 rounded-sm border border-primary/40"></div>
+<div class="w-full bg-primary/40 h-14"></div>
+</div>
+<div class="flex-1 flex flex-col justify-end gap-0.5 hidden sm:flex">
+<div class="w-full bg-primary/20 h-36 rounded-sm border border-primary/40"></div>
+<div class="w-full bg-primary/40 h-10"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Trade Panel -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<div class="glass-card rounded-xl overflow-hidden flex flex-col h-full">
+<div class="flex border-b border-white/5">
+<button id="tradeBuyBtn" class="flex-1 py-4 text-center font-bold text-primary border-b-2 border-primary bg-primary/5">Beli</button>
+<button id="tradeSellBtn" class="flex-1 py-4 text-center font-bold text-on-surface-variant hover:text-secondary transition-colors">Jual</button>
+</div>
+<div class="p-6 space-y-6 flex-1">
+<div class="flex p-1 bg-surface-container rounded-lg">
+<button class="flex-1 py-1.5 text-label-sm font-bold bg-surface-variant rounded shadow-sm">Limit</button>
+<button class="flex-1 py-1.5 text-label-sm font-bold text-on-surface-variant">Market</button>
+</div>
+<div class="space-y-4">
+<div>
+<label class="text-[10px] text-on-surface-variant uppercase font-bold mb-1 block">Emiten</label>
+<select id="tradeStockSelect" class="w-full bg-surface-container border-white/10 rounded-lg py-3 px-4 font-data-tabular focus:ring-primary focus:border-primary">
+<option value="">Memuat saham...</option>
+</select>
+</div>
+<div>
+<label class="text-[10px] text-on-surface-variant uppercase font-bold mb-1 block">Harga (IDR)</label>
+<div class="relative">
+<input id="tradePriceInput" class="w-full bg-surface-container border-white/10 rounded-lg py-3 px-4 font-data-tabular focus:ring-primary focus:border-primary" type="number" value="0"/>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col">
+<button class="material-symbols-outlined text-[16px] text-primary">expand_less</button>
+<button class="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</button>
+</div>
+</div>
+</div>
+<div>
+<label class="text-[10px] text-on-surface-variant uppercase font-bold mb-1 block">Lot</label>
+<div class="relative">
+<input id="tradeLotInput" class="w-full bg-surface-container border-white/10 rounded-lg py-3 px-4 font-data-tabular focus:ring-primary focus:border-primary" placeholder="0" type="number"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-label-sm text-on-surface-variant">Max 240</span>
+</div>
+</div>
+</div>
+<div class="bg-white/5 rounded-lg p-4 space-y-2">
+<div class="flex justify-between text-label-sm">
+<span class="text-on-surface-variant">Estimasi Nilai</span>
+<span id="estimateValue" class="font-data-tabular">Rp 0</span>
+</div>
+<div class="flex justify-between text-label-sm">
+<span class="text-on-surface-variant">Biaya (0.15%)</span>
+<span id="estimateFee" class="font-data-tabular">Rp 0</span>
+</div>
+<div class="border-t border-white/5 pt-2 flex justify-between">
+<span class="font-bold">Total</span>
+<span id="estimateTotal" class="font-data-tabular font-bold text-primary">Rp 0</span>
+</div>
+</div>
+<button id="tradeConfirmBtn" class="w-full py-4 bg-primary text-on-primary font-bold rounded-xl shadow-lg shadow-primary/20 hover:brightness-110 active:scale-[0.98] transition-all uppercase tracking-wider">
+                            Konfirmasi Transaksi
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Order Book -->
+<div class="glass-card rounded-xl p-5">
+<div class="flex justify-between items-center mb-4">
+<h4 class="font-bold">Order Book</h4>
+<span class="text-[10px] bg-white/10 px-2 py-0.5 rounded uppercase">Spread: 25</span>
+</div>
+<div class="grid grid-cols-2 gap-px bg-white/5">
+<div class="space-y-1 bg-surface py-2">
+<div class="flex justify-between px-2 text-[11px] text-on-surface-variant pb-2 border-b border-white/5">
+<span>Vol</span>
+<span>Bid</span>
+</div>
+<div class="relative group">
+<div class="absolute right-0 top-0 bottom-0 bg-primary/10 w-[70%]"></div>
+<div class="relative flex justify-between px-2 text-[12px] font-data-tabular py-1">
+<span class="text-on-surface-variant">1.240</span>
+<span class="text-primary font-bold">10.225</span>
+</div>
+</div>
+<div class="relative">
+<div class="absolute right-0 top-0 bottom-0 bg-primary/10 w-[45%]"></div>
+<div class="relative flex justify-between px-2 text-[12px] font-data-tabular py-1">
+<span class="text-on-surface-variant">840</span>
+<span class="text-primary font-bold">10.200</span>
+</div>
+</div>
+<div class="relative">
+<div class="absolute right-0 top-0 bottom-0 bg-primary/10 w-[90%]"></div>
+<div class="relative flex justify-between px-2 text-[12px] font-data-tabular py-1">
+<span class="text-on-surface-variant">2.890</span>
+<span class="text-primary font-bold">10.175</span>
+</div>
+</div>
+</div>
+<div class="space-y-1 bg-surface py-2">
+<div class="flex justify-between px-2 text-[11px] text-on-surface-variant pb-2 border-b border-white/5">
+<span>Offer</span>
+<span>Vol</span>
+</div>
+<div class="relative">
+<div class="absolute left-0 top-0 bottom-0 bg-secondary-container/10 w-[60%]"></div>
+<div class="relative flex justify-between px-2 text-[12px] font-data-tabular py-1">
+<span class="text-secondary font-bold">10.250</span>
+<span class="text-on-surface-variant">980</span>
+</div>
+</div>
+<div class="relative">
+<div class="absolute left-0 top-0 bottom-0 bg-secondary-container/10 w-[30%]"></div>
+<div class="relative flex justify-between px-2 text-[12px] font-data-tabular py-1">
+<span class="text-secondary font-bold">10.275</span>
+<span class="text-on-surface-variant">420</span>
+</div>
+</div>
+<div class="relative">
+<div class="absolute left-0 top-0 bottom-0 bg-secondary-container/10 w-[80%]"></div>
+<div class="relative flex justify-between px-2 text-[12px] font-data-tabular py-1">
+<span class="text-secondary font-bold">10.300</span>
+<span class="text-on-surface-variant">2.110</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Transaction History -->
+<div class="glass-card rounded-xl p-5">
+<h4 class="font-bold mb-4">Riwayat Transaksi</h4>
+<div id="historyList" class="space-y-4">
+<div class="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">BBCA</div>
+<div>
+<p class="text-[12px] font-bold">Beli 10 Lot</p>
+<p class="text-[10px] text-on-surface-variant">Today, 10:15</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-[12px] font-data-tabular">Rp 10.225.000</p>
+<span class="text-[9px] px-2 py-0.5 rounded-full bg-primary/20 text-primary uppercase font-bold">Selesai</span>
+</div>
+</div>
+<div class="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-secondary-container/10 flex items-center justify-center text-secondary font-bold text-[10px]">TLKM</div>
+<div>
+<p class="text-[12px] font-bold">Jual 50 Lot</p>
+<p class="text-[10px] text-on-surface-variant">Today, 09:30</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-[12px] font-data-tabular">Rp 19.500.000</p>
+<span class="text-[9px] px-2 py-0.5 rounded-full bg-surface-variant text-on-surface-variant uppercase font-bold">Open</span>
+</div>
+</div>
+<div class="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">GOTO</div>
+<div>
+<p class="text-[12px] font-bold">Beli 500 Lot</p>
+<p class="text-[10px] text-on-surface-variant">Yesterday</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-[12px] font-data-tabular">Rp 2.650.000</p>
+<span class="text-[9px] px-2 py-0.5 rounded-full bg-primary/20 text-primary uppercase font-bold">Selesai</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Watchlist -->
+<div class="glass-card rounded-xl p-5">
+<h4 class="font-bold mb-4">Watchlist</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[20px]">account_balance</span>
+</div>
+<div>
+<p class="text-[12px] font-bold">BBRI</p>
+<p class="text-[10px] text-on-surface-variant">Bank Rakyat Indonesia</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-16 h-8 opacity-50">
+<!-- Mini Sparkline Placeholder -->
+<svg class="w-full h-full stroke-primary stroke-2 fill-none" viewbox="0 0 100 40">
+<path d="M0 35 L10 30 L20 32 L30 20 L40 25 L50 15 L60 18 L70 5 L80 10 L90 2 L100 8"></path>
+</svg>
+</div>
+<div class="text-right">
+<p class="text-[12px] font-bold">4.890</p>
+<button class="text-[10px] text-primary hover:underline font-bold">Beli</button>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[20px]">apartment</span>
+</div>
+<div>
+<p class="text-[12px] font-bold">BMRI</p>
+<p class="text-[10px] text-on-surface-variant">Bank Mandiri</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-16 h-8 opacity-50">
+<svg class="w-full h-full stroke-secondary stroke-2 fill-none" viewbox="0 0 100 40">
+<path d="M0 5 L10 15 L20 10 L30 25 L40 20 L50 35 L60 30 L70 38 L80 32 L90 35 L100 30"></path>
+</svg>
+</div>
+<div class="text-right">
+<p class="text-[12px] font-bold">7.150</p>
+<button class="text-[10px] text-primary hover:underline font-bold">Beli</button>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[20px]">directions_car</span>
+</div>
+<div>
+<p class="text-[12px] font-bold">ASII</p>
+<p class="text-[10px] text-on-surface-variant">Astra International</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-16 h-8 opacity-50">
+<svg class="w-full h-full stroke-primary stroke-2 fill-none" viewbox="0 0 100 40">
+<path d="M0 20 L20 15 L40 22 L60 10 L80 12 L100 5"></path>
+</svg>
+</div>
+<div class="text-right">
+<p class="text-[12px] font-bold">5.225</p>
+<button class="text-[10px] text-primary hover:underline font-bold">Beli</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+
+<!-- Markets Section -->
+<div id="marketsSection" class="section-content hidden">
+<h2 class="text-headline-lg font-headline-lg mb-6">Pasar Saham</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="marketsGrid"></div>
+</div>
+
+<!-- Watchlist Section -->
+<div id="watchlistSection" class="section-content hidden">
+<h2 class="text-headline-lg font-headline-lg mb-6">Watchlist Saya</h2>
+<div class="grid grid-cols-1 gap-6" id="watchlistGrid"></div>
+</div>
+
+<!-- Portfolio Section -->
+<div id="portfolioSection" class="section-content hidden">
+<h2 class="text-headline-lg font-headline-lg mb-6">Portfolio Anda</h2>
+<div class="glass-card rounded-xl p-5" id="portfolioDetail"></div>
+</div>
+
+<!-- History Section -->
+<div id="historySection" class="section-content hidden">
+<h2 class="text-headline-lg font-headline-lg mb-6">Riwayat Transaksi</h2>
+<div class="glass-card rounded-xl p-5" id="historyDetail"></div>
+</div>
+
+<!-- Settings Section -->
+<div id="settingsSection" class="section-content hidden">
+<h2 class="text-headline-lg font-headline-lg mb-6">Pengaturan</h2>
+<div class="glass-card rounded-xl p-5 space-y-6">
+<div>
+<h3 class="font-bold mb-2">Profil Anda</h3>
+<p id="settingUserName" class="text-label-sm text-on-surface-variant"></p>
+<p id="settingUserEmail" class="text-label-sm text-on-surface-variant"></p>
+<p id="settingUserBalance" class="text-label-sm font-bold mt-2"></p>
+</div>
+</div>
+</div>
+
+<!-- Help Section -->
+<div id="helpSection" class="section-content hidden">
+<h2 class="text-headline-lg font-headline-lg mb-6">Bantuan & Dukungan</h2>
+<div class="glass-card rounded-xl p-5 space-y-4">
+<div><h3 class="font-bold">Cara Membeli Saham?</h3><p class="text-on-surface-variant text-label-sm">Pilih saham dari dropdown, masukkan jumlah lot, lalu klik "Konfirmasi Transaksi".</p></div>
+<div><h3 class="font-bold">Berapa Biaya Transaksi?</h3><p class="text-on-surface-variant text-label-sm">Biaya transaksi adalah 0.15% dari nilai total transaksi Anda.</p></div>
+<div><h3 class="font-bold">Hubungi Support</h3><p class="text-on-surface-variant text-label-sm">Email: support@nusatrade.id | Telepon: 1500-123</p></div>
+</div>
+</div>
+</main>
+    <script src="/client/js/api.js"></script>
+    <script src="/client/js/auth.js"></script>
+    <script src="/client/js/dashboard.js"></script>
+</body></html>

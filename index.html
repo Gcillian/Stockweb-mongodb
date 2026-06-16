@@ -1,0 +1,675 @@
+﻿<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#3a3939",
+                    "on-surface-variant": "#bbcabf",
+                    "on-primary-fixed-variant": "#005236",
+                    "surface-variant": "#353534",
+                    "on-secondary-container": "#ffaea8",
+                    "on-primary-fixed": "#002113",
+                    "error-container": "#93000a",
+                    "secondary": "#ffb3ad",
+                    "secondary-fixed": "#ffdad7",
+                    "on-tertiary": "#002e6a",
+                    "tertiary-container": "#71a1ff",
+                    "secondary-fixed-dim": "#ffb3ad",
+                    "inverse-on-surface": "#313030",
+                    "on-tertiary-fixed-variant": "#004395",
+                    "outline": "#86948a",
+                    "surface-container-lowest": "#0e0e0e",
+                    "surface-tint": "#4edea3",
+                    "tertiary": "#adc6ff",
+                    "primary": "#4edea3",
+                    "on-background": "#e5e2e1",
+                    "on-error": "#690005",
+                    "inverse-surface": "#e5e2e1",
+                    "primary-fixed-dim": "#4edea3",
+                    "outline-variant": "#3c4a42",
+                    "on-surface": "#e5e2e1",
+                    "on-secondary-fixed": "#410004",
+                    "secondary-container": "#a40217",
+                    "surface-container-highest": "#353534",
+                    "on-primary": "#003824",
+                    "surface-container-low": "#1c1b1b",
+                    "primary-fixed": "#6ffbbe",
+                    "inverse-primary": "#006c49",
+                    "on-tertiary-container": "#00367a",
+                    "tertiary-fixed-dim": "#adc6ff",
+                    "surface-dim": "#131313",
+                    "tertiary-fixed": "#d8e2ff",
+                    "background": "#131313",
+                    "surface-container": "#201f1f",
+                    "error": "#ffb4ab",
+                    "on-secondary-fixed-variant": "#930013",
+                    "on-tertiary-fixed": "#001a42",
+                    "on-secondary": "#68000a",
+                    "on-primary-container": "#00422b",
+                    "on-error-container": "#ffdad6",
+                    "primary-container": "#10b981",
+                    "surface-container-high": "#2a2a2a",
+                    "surface": "#131313"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "1.5rem",
+                    "lg": "2rem",
+                    "xs": "0.5rem",
+                    "gutter": "1.5rem",
+                    "xl": "3rem",
+                    "base": "4px",
+                    "container-max": "1280px",
+                    "sm": "1rem"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "data-tabular": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "data-tabular": ["14px", {"lineHeight": "1.4", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body {
+        background-color: #0A0A0A;
+        color: #e5e2e1;
+        scroll-behavior: smooth;
+      }
+      .glass-card {
+        background: rgba(22, 22, 22, 0.6);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .glow-emerald {
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #0A0A0A;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #353534;
+        border-radius: 10px;
+      }
+      .terminal-grid {
+        display: grid;
+        grid-template-columns: 240px 1fr 300px;
+        grid-template-rows: 1fr 200px;
+        gap: 1px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .chart-line {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+        animation: dash 3s linear forwards;
+      }
+      @keyframes dash {
+        to { stroke-dashoffset: 0; }
+      }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-lg h-16 max-w-container-max mx-auto left-1/2 -translate-x-1/2 bg-surface/80 backdrop-blur-xl border-b border-white/10">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">NusaTrade</span>
+<div class="hidden md:flex items-center gap-lg">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md transition-all" href="#">Market</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md hover:opacity-80" href="#">Features</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md hover:opacity-80" href="#">News</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md hover:opacity-80" href="#">Why Us</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button id="loginBtn" class="text-on-surface font-body-md text-body-md px-md py-xs hover:opacity-80 transition-all">Masuk</button>
+<button id="tradingBtn" class="bg-primary text-on-primary font-bold font-body-md text-body-md px-lg py-xs rounded-lg hover:opacity-80 transition-all active:scale-95 duration-150">Mulai Trading</button>
+<div id="userPanel" class="hidden flex items-center gap-md">
+<span id="userNameDisplay" class="text-on-surface font-body-md"></span>
+<button id="logoutBtn" class="text-error font-body-md text-body-md px-md py-xs hover:opacity-80 transition-all">Keluar</button>
+</div>
+</div>
+</nav>
+<main class="pt-16">
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex items-center px-gutter overflow-hidden">
+<div class="max-w-container-max mx-auto grid md:grid-cols-2 gap-xl items-center relative z-10">
+<div class="space-y-md">
+<div class="inline-flex items-center gap-xs px-sm py-1 rounded-full bg-primary/10 border border-primary/20 text-primary">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span class="font-label-sm text-label-sm">IDX REGULATED PLATFORM</span>
+</div>
+<h1 class="font-display-lg text-display-lg md:text-[64px] leading-tight text-on-surface">
+                        Platform Jual Beli <br/>
+<span class="text-primary">Saham Indonesia</span> <br/>
+                        Modern
+                    </h1>
+<p class="text-on-surface-variant font-body-lg text-body-lg max-w-lg">
+                        Beli dan jual saham perusahaan Indonesia secara real-time dengan pengalaman trading yang cepat, aman, dan didukung teknologi kelas institusi.
+                    </p>
+<div class="flex flex-wrap gap-md pt-sm">
+<button class="bg-primary text-on-primary font-bold px-xl py-md rounded-xl text-body-lg hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-primary/20">
+                            Mulai Trading
+                        </button>
+<button class="glass-card text-on-surface font-bold px-xl py-md rounded-xl text-body-lg hover:bg-white/5 transition-all">
+                            Lihat Pasar
+                        </button>
+</div>
+</div>
+<div class="relative hidden md:block">
+<!-- Floating UI Elements -->
+<div class="absolute -top-10 -right-10 glass-card p-md rounded-xl border-primary/20 animate-pulse">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant">BBCA</p>
+<p class="font-data-tabular text-data-tabular text-primary">+2.45%</p>
+</div>
+</div>
+</div>
+<!-- Hero Visual Canvas -->
+<div class="glass-card rounded-2xl overflow-hidden shadow-2xl shadow-primary/5 aspect-video w-full flex items-center justify-center p-md">
+<img alt="Terminal Trading" class="rounded-xl w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700" data-alt="A sophisticated digital trading dashboard for the Indonesian stock market shown on a high-resolution wide-screen monitor. The display features intricate emerald green candlestick charts, real-time scrolling tickers, and glassmorphic data panels against an obsidian-black background. Glowing neon green lines and data bubbles represent stock movements, creating an atmosphere of speed and high-precision financial technology. The lighting is low-key with soft green ambient glows, evoking a premium command center aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3IKtlHZSUngns7w-TOtM_HEuk-KWzzUHiOYZAtbnnxWisMNI0QSzUgl1k8TyCRYiwqRxTzvK1YOmf6vOL_mXJmp0o-erSwObXN-MJFX75cGMvVrzJ_lXJcNTCyO_LeYN1bFYWLr3kI4C1RGdwPEjZRpKnVJdVpnqZlkLQ4Y-qj8q5kOD9ZsMnoo2z080qv1f_0cF_Jcs1kjIuSeFB9HDZGH2-nhcR14IA56BEcvkaBvg2Q-nKy61fW04hl90_GiSNP24ScU5txlV2"/>
+</div>
+</div>
+</div>
+<!-- Atmospheric Glows -->
+<div class="absolute top-1/4 -right-1/4 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full"></div>
+</section>
+<!-- Live Market Section -->
+<section class="py-xl bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Pasar Hari Ini</h2>
+<p class="text-on-surface-variant font-body-md text-body-md mt-xs">Update harga saham IDX secara real-time</p>
+</div>
+<button class="text-primary font-label-sm text-label-sm flex items-center gap-xs">
+                        LIHAT SEMUA <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-md">
+<!-- Market Card BBCA -->
+<div class="glass-card p-md rounded-xl hover:border-primary/40 transition-all group cursor-pointer">
+<div class="flex justify-between mb-xs">
+<span class="font-bold text-on-surface">BBCA</span>
+<span class="text-primary text-label-sm font-data-tabular">+1.25%</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mb-md truncate">Bank Central Asia</p>
+<p class="font-data-tabular text-headline-md text-on-surface">10,250</p>
+<div class="h-12 flex items-end gap-[2px] mt-sm">
+<div class="w-full h-1/2 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-2/3 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-1/3 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-3/4 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-1/2 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+</div>
+</div>
+<!-- Market Card BBRI -->
+<div class="glass-card p-md rounded-xl hover:border-primary/40 transition-all group cursor-pointer">
+<div class="flex justify-between mb-xs">
+<span class="font-bold text-on-surface">BBRI</span>
+<span class="text-primary text-label-sm font-data-tabular">+0.95%</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mb-md truncate">Bank Rakyat Indonesia</p>
+<p class="font-data-tabular text-headline-md text-on-surface">4,850</p>
+<div class="h-12 flex items-end gap-[2px] mt-sm">
+<div class="w-full h-2/3 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-1/2 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-3/4 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-1/4 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-2/3 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+</div>
+</div>
+<!-- Market Card TLKM -->
+<div class="glass-card p-md rounded-xl hover:border-secondary/40 transition-all group cursor-pointer">
+<div class="flex justify-between mb-xs">
+<span class="font-bold text-on-surface">TLKM</span>
+<span class="text-secondary text-label-sm font-data-tabular">-0.52%</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mb-md truncate">Telkom Indonesia</p>
+<p class="font-data-tabular text-headline-md text-on-surface">3,240</p>
+<div class="h-12 flex items-end gap-[2px] mt-sm">
+<div class="w-full h-3/4 bg-secondary/20 rounded-t-sm group-hover:bg-secondary transition-all"></div>
+<div class="w-full h-2/3 bg-secondary/20 rounded-t-sm group-hover:bg-secondary transition-all"></div>
+<div class="w-full h-1/2 bg-secondary/20 rounded-t-sm group-hover:bg-secondary transition-all"></div>
+<div class="w-full h-1/3 bg-secondary/20 rounded-t-sm group-hover:bg-secondary transition-all"></div>
+<div class="w-full h-1/4 bg-secondary/20 rounded-t-sm group-hover:bg-secondary transition-all"></div>
+</div>
+</div>
+<!-- Market Card ASII -->
+<div class="glass-card p-md rounded-xl hover:border-primary/40 transition-all group cursor-pointer">
+<div class="flex justify-between mb-xs">
+<span class="font-bold text-on-surface">ASII</span>
+<span class="text-primary text-label-sm font-data-tabular">+2.10%</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mb-md truncate">Astra International</p>
+<p class="font-data-tabular text-headline-md text-on-surface">5,150</p>
+<div class="h-12 flex items-end gap-[2px] mt-sm">
+<div class="w-full h-1/4 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-1/2 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-2/3 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-3/4 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-full bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+</div>
+</div>
+<!-- Market Card BMRI -->
+<div class="glass-card p-md rounded-xl hover:border-primary/40 transition-all group cursor-pointer">
+<div class="flex justify-between mb-xs">
+<span class="font-bold text-on-surface">BMRI</span>
+<span class="text-primary text-label-sm font-data-tabular">+1.15%</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mb-md truncate">Bank Mandiri</p>
+<p class="font-data-tabular text-headline-md text-on-surface">7,025</p>
+<div class="h-12 flex items-end gap-[2px] mt-sm">
+<div class="w-full h-1/2 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-1/3 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-2/3 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-1/2 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+<div class="w-full h-3/4 bg-primary/20 rounded-t-sm group-hover:bg-primary transition-all"></div>
+</div>
+</div>
+<!-- IHSG Composite -->
+<div class="glass-card p-md rounded-xl border-primary/20 hover:border-primary/40 transition-all group cursor-pointer bg-primary/5">
+<div class="flex justify-between mb-xs">
+<span class="font-bold text-primary">IHSG</span>
+<span class="text-primary text-label-sm font-data-tabular">+0.42%</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mb-md truncate">Composite Index</p>
+<p class="font-data-tabular text-headline-md text-on-surface">7,321.5</p>
+<div class="h-12 flex items-end gap-[2px] mt-sm">
+<div class="w-full h-3/4 bg-primary/40 rounded-t-sm"></div>
+<div class="w-full h-2/3 bg-primary/40 rounded-t-sm"></div>
+<div class="w-full h-3/4 bg-primary/40 rounded-t-sm"></div>
+<div class="w-full h-full bg-primary/40 rounded-t-sm"></div>
+<div class="w-full h-2/3 bg-primary/40 rounded-t-sm"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Trading Features Section (Bento Grid) -->
+<section class="py-xl">
+<div class="max-w-container-max mx-auto px-gutter">
+<h2 class="font-headline-lg text-headline-lg text-on-surface text-center mb-xl">Teknologi Trading Terdepan</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Large Feature -->
+<div class="md:col-span-2 glass-card rounded-2xl p-lg flex flex-col justify-between overflow-hidden relative group">
+<div class="max-w-md relative z-10">
+<span class="material-symbols-outlined text-primary text-[40px] mb-md">monitoring</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-sm">Interactive Pro Charts</h3>
+<p class="text-on-surface-variant font-body-md text-body-md">Analisis teknikal mendalam dengan 100+ indikator dan charting super responsif untuk memantau pergerakan harga saham IDX.</p>
+</div>
+<div class="mt-xl relative z-10">
+<img alt="Chart Feature" class="rounded-xl border border-white/5 shadow-2xl opacity-80 group-hover:scale-105 transition-transform duration-700" data-alt="A detailed financial line chart with multiple technical indicators like moving averages and volume bars. The chart is rendered in a vibrant emerald green and soft white against a charcoal-gray digital background. The UI surrounds the chart with minimalist trading tools and time-frame selectors (1D, 1W, 1M). The overall mood is analytical and high-tech, reflecting a professional trading environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVQ3i04Y77OAzLbo5PVSQ_vPLYgvwpH197bOoTFIekEwfR11tXtLib0xCyeJSdOEa_y8Dpu4HH2lalUYiG58Fpoo9sRVjDndru4P5Jq8tWnup-sTYSUWJJcPCoaxQN_5uZ_hXqRv5Txjy9PmtvGbCipx31RjBIUcRKSUUWsHDG1ZZsXhfrnnPI6xXVfk7qtND9DCd5sALV6HupR85cVoW3TwmeOJ4FUs8LGG5LqWZ0qqRxF-uh_aQK7Ts3d_FqqNhZBT9wLMj_9mXw"/>
+</div>
+</div>
+<div class="space-y-md">
+<div class="glass-card rounded-2xl p-lg group">
+<span class="material-symbols-outlined text-primary text-[32px] mb-sm">bolt</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Fast Execution</h3>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Eksekusi order milidetik untuk memastikan Anda mendapatkan harga terbaik.</p>
+</div>
+<div class="glass-card rounded-2xl p-lg group">
+<span class="material-symbols-outlined text-primary text-[32px] mb-sm">security</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Secure Assets</h3>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Keamanan berlapis dengan enkripsi standar bank dan otentikasi dua faktor.</p>
+</div>
+</div>
+<div class="glass-card rounded-2xl p-lg flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-primary text-[32px] mb-sm">dashboard</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Watchlist &amp; Alerts</h3>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Pantau saham favorit Anda dan terima notifikasi real-time saat harga menyentuh target.</p>
+</div>
+</div>
+<div class="glass-card rounded-2xl p-lg flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-primary text-[32px] mb-sm">view_quilt</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Market Depth</h3>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Analisis supply dan demand secara akurat dengan data order book Level 2.</p>
+</div>
+</div>
+<div class="glass-card rounded-2xl p-lg flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-primary text-[32px] mb-sm">account_balance_wallet</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Portfolio Insights</h3>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Manajemen aset pintar dengan laporan performa dan diversifikasi portfolio otomatis.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Trading Interface Preview (Terminal) -->
+<section class="py-xl bg-surface-container-low overflow-hidden">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="text-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Terminal Trading Profesional</h2>
+<p class="text-on-surface-variant font-body-md text-body-md mt-xs">Pengalaman trading desktop yang dioptimalkan untuk performa tinggi</p>
+</div>
+<!-- Mockup Terminal -->
+<div class="glass-card rounded-2xl overflow-hidden border-white/5 shadow-2xl">
+<!-- Terminal Header -->
+<div class="h-10 bg-surface-variant flex items-center justify-between px-md border-b border-white/5">
+<div class="flex items-center gap-md">
+<span class="font-bold text-primary font-data-tabular">BBCA / IDR</span>
+<div class="flex items-center gap-xs text-[10px] text-on-surface-variant font-data-tabular">
+<span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                                LIVE CONNECTION
+                            </div>
+</div>
+<div class="flex gap-xs">
+<div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+<div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+<div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+</div>
+</div>
+<div class="terminal-grid h-[600px] font-data-tabular text-[12px]">
+<!-- Order Book (Left) -->
+<div class="bg-surface p-sm border-r border-white/5 overflow-y-auto custom-scrollbar">
+<p class="font-bold text-on-surface mb-sm">ORDER BOOK</p>
+<div class="space-y-[2px]">
+<!-- Bids -->
+<div class="flex justify-between text-secondary bg-secondary/5 px-xs"><span>10,275</span> <span>452</span></div>
+<div class="flex justify-between text-secondary bg-secondary/5 px-xs"><span>10,250</span> <span>1,204</span></div>
+<div class="flex justify-between text-secondary bg-secondary/5 px-xs"><span>10,225</span> <span>890</span></div>
+<!-- Current Price -->
+<div class="py-sm text-center border-y border-white/5 my-xs">
+<span class="text-lg font-bold text-primary">10,250</span>
+</div>
+<!-- Asks -->
+<div class="flex justify-between text-primary bg-primary/5 px-xs"><span>10,275</span> <span>340</span></div>
+<div class="flex justify-between text-primary bg-primary/5 px-xs"><span>10,300</span> <span>1,560</span></div>
+<div class="flex justify-between text-primary bg-primary/5 px-xs"><span>10,325</span> <span>210</span></div>
+</div>
+</div>
+<!-- Main Chart (Center) -->
+<div class="bg-[#0c0c0c] flex flex-col relative">
+<div class="p-sm flex gap-md border-b border-white/5">
+<span class="bg-surface-variant px-xs rounded">1M</span>
+<span class="text-on-surface-variant">5M</span>
+<span class="text-on-surface-variant">15M</span>
+<span class="text-on-surface-variant">1H</span>
+<span class="text-on-surface-variant">1D</span>
+</div>
+<div class="flex-1 p-lg flex items-center justify-center relative overflow-hidden">
+<!-- Mock Candlesticks -->
+<svg class="w-full h-full" viewbox="0 0 800 400">
+<line stroke="rgba(255,255,255,0.05)" x1="0" x2="800" y1="300" y2="300"></line>
+<line stroke="rgba(255,255,255,0.05)" x1="0" x2="800" y1="200" y2="200"></line>
+<line stroke="rgba(255,255,255,0.05)" x1="0" x2="800" y1="100" y2="100"></line>
+<!-- Candlestick Path Example -->
+<g class="fill-primary/40 stroke-primary">
+<rect height="80" rx="1" width="10" x="50" y="200"></rect>
+<rect height="40" rx="1" width="10" x="70" y="180"></rect>
+<rect height="60" rx="1" width="10" x="90" y="150"></rect>
+<rect height="90" rx="1" width="10" x="110" y="120"></rect>
+<rect height="40" rx="1" width="10" x="130" y="100"></rect>
+</g>
+<!-- Animated Line -->
+<path class="chart-line fill-none stroke-primary stroke-2" d="M0,350 L100,320 L200,340 L300,280 L400,300 L500,200 L600,240 L700,150 L800,100"></path>
+</svg>
+<div class="absolute right-4 top-4 glass-card p-xs rounded text-[10px] text-primary">
+                                    HIGH: 10,400
+                                </div>
+</div>
+<!-- Bottom Market Activity -->
+<div class="h-[200px] border-t border-white/5 p-sm bg-surface overflow-y-auto custom-scrollbar">
+<p class="font-bold text-on-surface mb-xs uppercase">Recent Activity</p>
+<table class="w-full text-left">
+<tbody><tr class="text-on-surface-variant border-b border-white/5">
+<th class="py-xs font-normal">TIME</th>
+<th class="py-xs font-normal">TYPE</th>
+<th class="py-xs font-normal">PRICE</th>
+<th class="py-xs font-normal">SIZE</th>
+</tr>
+<tr class="text-primary">
+<td class="py-xs">14:20:05</td>
+<td>BUY</td>
+<td>10,250</td>
+<td>150</td>
+</tr>
+<tr class="text-secondary">
+<td class="py-xs">14:19:58</td>
+<td>SELL</td>
+<td>10,245</td>
+<td>42</td>
+</tr>
+</tbody></table>
+</div>
+</div>
+<!-- Order Panel (Right) -->
+<div class="bg-surface p-md border-l border-white/5 flex flex-col gap-md">
+<div>
+<p class="font-bold text-on-surface mb-md">TRANSAKSI</p>
+<div class="flex gap-xs mb-md">
+<button class="flex-1 py-xs rounded bg-primary text-on-primary font-bold">BELI</button>
+<button class="flex-1 py-xs rounded bg-surface-variant text-on-surface">JUAL</button>
+</div>
+<div class="space-y-sm">
+<div>
+<label class="text-on-surface-variant block mb-xs">Limit Price</label>
+<div class="bg-surface-container-high border border-white/10 rounded p-xs flex justify-between">
+<span>10,250</span>
+<span class="text-on-surface-variant">IDR</span>
+</div>
+</div>
+<div>
+<label class="text-on-surface-variant block mb-xs">Amount</label>
+<div class="bg-surface-container-high border border-white/10 rounded p-xs flex justify-between">
+<span>0</span>
+<span class="text-on-surface-variant">LOT</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-md border-t border-white/5">
+<div class="flex justify-between text-on-surface-variant mb-xs">
+<span>Saldo RDN</span>
+<span>Rp 12.500.000</span>
+</div>
+<button class="w-full py-md rounded-xl bg-primary text-on-primary font-bold text-body-md hover:opacity-90 active:scale-95 transition-all">
+                                    BELI BBCA
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Why Choose Section -->
+<section class="py-xl px-gutter max-w-container-max mx-auto">
+<div class="grid md:grid-cols-2 gap-xl items-center">
+<div class="relative">
+<div class="w-full aspect-square rounded-3xl overflow-hidden glass-card p-xl border-primary/20">
+<img alt="Professional Trading" class="w-full h-full object-cover rounded-2xl opacity-40 hover:opacity-100 transition-opacity duration-1000" data-alt="A macro close-up of a high-tech financial data visualization, featuring glowing green and blue node-based connections across a dark, glass-like surface. The lighting is moody and cinematic, highlighting sharp digital textures and vibrant data streams. The image conveys a sense of deep technological security and institutional-grade data processing, perfectly matching a premium fintech brand aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdMsLoQmn39mdv_4NfxiO595_w_zOOsrQoC3iO2AgFZDFXqF3E1db8xFcs2hI6JqMoOQzCTfzCb7bV5he_rrmVtaf3bo5cz2kGDT1_ikJzd5nj2-X_Wjfc6Oaai7oAk5g2sdqTrVyrb00YJwbQ7_nzke-Gh4CWCCGbMsBXNPrZrNRpfjq_NFIM_nDM5YNc7YV0pQLMlx3-v9LceZwjAp0l9BT3cdRrhuPbe9B8yHaEPujVzjooAA2BcWpCFXdfUum79sVWiaA-Td2r"/>
+</div>
+<div class="absolute -bottom-10 -right-10 bg-primary p-lg rounded-2xl text-on-primary shadow-xl">
+<p class="text-[40px] font-bold">99.9%</p>
+<p class="text-label-sm font-label-sm uppercase tracking-widest">Uptime System</p>
+</div>
+</div>
+<div class="space-y-lg">
+<h2 class="font-display-lg text-display-lg text-on-surface leading-tight">Mengapa Memilih <span class="text-primary">NusaTrade?</span></h2>
+<div class="space-y-md">
+<div class="flex gap-md">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex-shrink-0 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Aman &amp; Terpercaya</h4>
+<p class="text-on-surface-variant font-body-md text-body-md">Diawasi oleh OJK dan merupakan anggota resmi Bursa Efek Indonesia (IDX).</p>
+</div>
+</div>
+<div class="flex gap-md">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex-shrink-0 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">speed</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Data Real-time 0 Latency</h4>
+<p class="text-on-surface-variant font-body-md text-body-md">Dapatkan pembaruan harga langsung dari server IDX tanpa penundaan sedikitpun.</p>
+</div>
+</div>
+<div class="flex gap-md">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex-shrink-0 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">devices</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Interface Modern</h4>
+<p class="text-on-surface-variant font-body-md text-body-md">Desain intuitif yang mempermudah navigasi bagi pemula maupun profesional.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Market News Section -->
+<section class="py-xl bg-surface-container-low">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="flex justify-between items-center mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Berita Pasar Terkini</h2>
+<button class="text-on-surface-variant font-label-sm text-label-sm hover:text-primary transition-colors">BACA SEMUA BERITA</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="glass-card rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+<div class="h-48 overflow-hidden">
+<img alt="IDX News" class="w-full h-full object-cover" data-alt="A focused image of a digital news ticker screen in a modern financial district, displaying scrolling green and red stock market data. The environment is blurred in the background, creating a shallow depth of field. The lighting is dominated by the glowing digital display, casting a cool blue and emerald green light over the scene, evoking a fast-paced, professional financial news atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQOKmyXb0O90EyYejWE9RL6v6TO1wvOlCcqLHmyKXIUzzmebM5AzgNN4cNmvhrCFbzEy_0SvNYeXpddVEoZjjOP5Vg2IwkApEP6JDWLSAMmGr6PK091lNGVRC9SdwiFiNR9UUQcgtqYv5buM6752Jpz_zSTVejH7xC1HyDpmQOV3Bf0h5w8_4nd5NB4lrEGVe4iccWgL8WkZckajccZnZO2r1kppvulJz03RpNDsRXAYvMxYCqBlJIqLy-gr3vW57qh_DstLRHEPGq"/>
+</div>
+<div class="p-md">
+<span class="text-primary text-[10px] font-bold uppercase tracking-widest">Macro Economy</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mt-xs mb-sm leading-tight">IHSG Diprediksi Menguat Seiring Penurunan Suku Bunga</h3>
+<p class="text-on-surface-variant text-label-sm font-label-sm">Analis memproyeksikan indeks akan menembus level 7.400 pekan depan...</p>
+</div>
+</div>
+<div class="glass-card rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+<div class="h-48 overflow-hidden">
+<img alt="Stock Trends" class="w-full h-full object-cover" data-alt="A high-tech digital infographic displaying a network of interconnected financial data nodes and glowing trend lines. The palette is a sophisticated mix of deep obsidian and vibrant emerald green. The style is abstract and futuristic, representing the flow of information in a modern global economy. Soft light highlights the crystalline edges of the data points." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAClzlR3XWZQotOPq7-OsymCTDmXsyevj6Mgh0f8pX1oveH784guJyPwSQ20v08dYHlJLgCSbC2CtYHTc65ZrLGwv_kcOuGmvEalGPWYiKxhGJafM3yMUyyKgkII9HGXUhbDYr4qMTYLCgqRlCKuxCcyveYjzfbpFbF92oSIrGZfpZF8TmFfyLb8ikMzT_QT9PQZ7F_d37y374m8NlbPsOeualboG7T0MaD7LxwLhqroULvymvigyirJ2ToefRrSHhPIFy3eOyrhd3i"/>
+</div>
+<div class="p-md">
+<span class="text-primary text-[10px] font-bold uppercase tracking-widest">Trending Stocks</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mt-xs mb-sm leading-tight">BBCA Cetak Rekor Laba Bersih Tertinggi di Q1 2024</h3>
+<p class="text-on-surface-variant text-label-sm font-label-sm">Kinerja emiten perbankan tetap solid di tengah ketidakpastian global...</p>
+</div>
+</div>
+<div class="glass-card rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+<div class="h-48 overflow-hidden">
+<img alt="Tech Investments" class="w-full h-full object-cover" data-alt="A person's hands holding a sleek smartphone displaying a minimalist trading app interface. The setting is a luxury workspace with subtle emerald green lighting and high-end tech accessories in the background. The mood is sophisticated and focused, emphasizing the accessibility and power of modern mobile trading platforms." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApFzxLwEnGP9Rc8SqIBszjrgFh5hsPVafyAQrmlKJNgWTnrKGkiS61LcSqzX-ISdyOwpPRF7aneRODne1YICAbWqN48GiO_OO5PSVLESs21z8LhgOWeWbkZZJIeZiHV6w0Us6lkOWf5gZPucE4uxIkst6v8HkaidbxKFV124emoCS5MFqYPUS95Ns5Pr609yUKfjXAqAEXUDXnvAN2gtRNiqv8uX5r7ne_OLfCTuuvJdJ06Vr7LJFBnLiQU14jWf210O3QsEe2kVhk"/>
+</div>
+<div class="p-md">
+<span class="text-primary text-[10px] font-bold uppercase tracking-widest">Market Analysis</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mt-xs mb-sm leading-tight">Sektor Teknologi Indonesia Kembali Dilirik Investor Asing</h3>
+<p class="text-on-surface-variant text-label-sm font-label-sm">Aliran modal masuk ke saham-saham digital menunjukkan tren positif...</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-xl relative overflow-hidden">
+<div class="max-w-container-max mx-auto px-gutter relative z-10">
+<div class="glass-card rounded-3xl p-xl flex flex-col items-center text-center border-primary/30">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-md">Siap Membangun Portofolio Anda?</h2>
+<p class="text-on-surface-variant font-body-lg text-body-lg max-w-2xl mb-xl">Bergabunglah dengan ribuan investor lainnya dan nikmati pengalaman trading saham terbaik di Indonesia.</p>
+<div class="flex flex-wrap justify-center gap-md">
+<button class="bg-primary text-on-primary font-bold px-xl py-md rounded-xl text-body-lg hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-primary/20">
+                            Buka Akun Sekarang
+                        </button>
+<button class="glass-card px-xl py-md rounded-xl text-on-surface font-bold text-body-lg hover:bg-white/5 transition-all">
+                            Hubungi Tim Kami
+                        </button>
+</div>
+</div>
+</div>
+<!-- Background Glow -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/5 blur-[150px] -z-0"></div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl px-lg flex flex-col items-center gap-md bg-surface-container-lowest border-t border-white/5">
+<div class="w-full max-w-container-max grid md:grid-cols-4 gap-xl mb-xl">
+<div class="space-y-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">NusaTrade</span>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Membangun masa depan investasi Indonesia dengan teknologi modern dan aman.</p>
+</div>
+<div class="flex flex-col gap-sm">
+<p class="font-bold text-on-surface">Perusahaan</p>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Tentang Kami</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Pusat Bantuan</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Karir</a>
+</div>
+<div class="flex flex-col gap-sm">
+<p class="font-bold text-on-surface">Legal</p>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Syarat &amp; Ketentuan</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Kebijakan Privasi</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Manajemen Risiko</a>
+</div>
+<div class="flex flex-col gap-sm">
+<p class="font-bold text-on-surface">Hubungi Kami</p>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">support@nusatrade.id</a>
+<div class="flex gap-md mt-sm">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer">public</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer">language</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer">share</span>
+</div>
+</div>
+</div>
+<div class="w-full max-w-container-max pt-xl border-t border-white/5 text-center">
+<p class="text-on-surface-variant font-label-sm text-label-sm opacity-60">
+                Â© 2024 NusaTrade. Berinvestasi mengandung risiko. Pelajari instrumen investasi sebelum memulai. <br/>
+                PT NusaTrade Berjangka adalah pialang berjangka resmi yang terdaftar dan diawasi oleh OJK.
+            </p>
+</div>
+</footer>
+<script>
+      // Simple Micro-interaction for hover effects on glass cards
+      document.querySelectorAll('.glass-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        });
+      });
+    </script>
+    <script src="/client/js/api.js"></script>
+    <script src="/client/js/auth.js"></script>
+    <script src="/client/js/dashboard.js"></script>
+</body>
+</html>

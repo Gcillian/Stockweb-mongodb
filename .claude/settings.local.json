@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Force)",
+      "Bash(Select-Object Mode, Name)",
+      "WebSearch",
+      "Bash(node -c client/js/dashboard.js)",
+      "Bash(node -e ' *)",
+      "Bash(tasklist)",
+      "Bash(npm start *)",
+      "Bash(curl -s -o /dev/null -w \"Status: %{http_code}\\\\n\" http://localhost:4000/test-menu.html)",
+      "WebFetch(domain:localhost)",
+      "Bash(curl -s http://localhost:4000/test-menu.html)",
+      "Bash(curl -s -o /dev/null -w \"dashboard.js: %{http_code}\\\\n\" http://localhost:4000/client/js/dashboard.js)",
+      "Bash(curl -s -o /dev/null -w \"api.js: %{http_code}\\\\n\" http://localhost:4000/client/js/api.js)",
+      "PowerShell(Get-Process *)"
+    ]
+  }
+}

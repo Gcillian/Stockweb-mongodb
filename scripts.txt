@@ -1,0 +1,3 @@
+﻿    <script src="/client/js/api.js"></script>
+    <script src="/client/js/auth.js"></script>
+    <script src="/client/js/dashboard.js"></script>

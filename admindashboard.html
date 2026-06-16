@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NusaTrade Admin Panel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(22, 22, 22, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(78, 222, 163, 0.2);
+            background: rgba(26, 26, 26, 0.8);
+        }
+
+        .chart-gradient {
+            background: linear-gradient(180deg, rgba(78, 222, 163, 0.1) 0%, rgba(78, 222, 163, 0) 100%);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        @keyframes pulse-emerald {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pulse-dot {
+            animation: pulse-emerald 2s infinite ease-in-out;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#bbcabf",
+                        "tertiary-fixed-dim": "#adc6ff",
+                        "secondary-container": "#a40217",
+                        "background": "#131313",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary-fixed": "#d8e2ff",
+                        "on-secondary-container": "#ffaea8",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-tint": "#4edea3",
+                        "inverse-on-surface": "#313030",
+                        "primary": "#4edea3",
+                        "on-surface": "#e5e2e1",
+                        "secondary-fixed-dim": "#ffb3ad",
+                        "outline": "#86948a",
+                        "tertiary-container": "#71a1ff",
+                        "inverse-surface": "#e5e2e1",
+                        "secondary": "#ffb3ad",
+                        "surface-container-lowest": "#0e0e0e",
+                        "primary-fixed": "#6ffbbe",
+                        "on-tertiary": "#002e6a",
+                        "surface-bright": "#3a3939",
+                        "on-tertiary-container": "#00367a",
+                        "on-error": "#690005",
+                        "tertiary": "#adc6ff",
+                        "on-secondary-fixed-variant": "#930013",
+                        "surface-dim": "#131313",
+                        "surface-container-highest": "#353534",
+                        "on-secondary-fixed": "#410004",
+                        "on-secondary": "#68000a",
+                        "error-container": "#93000a",
+                        "on-primary-fixed": "#002113",
+                        "primary-fixed-dim": "#4edea3",
+                        "on-primary": "#003824",
+                        "surface-container": "#201f1f",
+                        "inverse-primary": "#006c49",
+                        "surface-variant": "#353534",
+                        "on-tertiary-fixed": "#001a42",
+                        "error": "#ffb4ab",
+                        "primary-container": "#10b981",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#005236",
+                        "secondary-fixed": "#ffdad7",
+                        "surface": "#131313",
+                        "on-background": "#e5e2e1",
+                        "on-primary-container": "#00422b",
+                        "outline-variant": "#3c4a42",
+                        "on-tertiary-fixed-variant": "#004395"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "xl": "3rem",
+                        "sm": "1rem",
+                        "xs": "0.5rem",
+                        "gutter": "1.5rem",
+                        "base": "4px",
+                        "md": "1.5rem",
+                        "lg": "2rem"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Geist"],
+                        "data-tabular": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "display-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "data-tabular": ["14px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 border-r border-white/10 backdrop-blur-xl bg-surface flex flex-col py-md z-[60]">
+<div class="px-md mb-lg">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">NusaTrade</h1>
+<p class="text-on-surface-variant font-label-sm opacity-60">Enterprise Admin</p>
+</div>
+<nav class="flex-1 space-y-1 px-sm">
+<!-- Active Tab: Dashboard -->
+<a data-admin-menu="dashboard" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'dashboard')" class="admin-menu-link flex items-center gap-xs px-md py-sm text-primary font-bold border-r-2 border-primary bg-primary/5 transition-all cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a data-admin-menu="users" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'users')" class="admin-menu-link flex items-center gap-xs px-md py-sm text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors duration-200 cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>User Management</span>
+</a>
+<a data-admin-menu="trading" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'trading')" class="admin-menu-link flex items-center gap-xs px-md py-sm text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors duration-200 cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span>Trading Activity</span>
+</a>
+<a data-admin-menu="deposits" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'deposits')" class="admin-menu-link flex items-center gap-xs px-md py-sm text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors duration-200 cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span>Deposits &amp; Withdrawals</span>
+</a>
+<a data-admin-menu="monitoring" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'monitoring')" class="admin-menu-link flex items-center gap-xs px-md py-sm text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors duration-200 cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span>Market Monitoring</span>
+</a>
+<a data-admin-menu="stocks" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'stocks')" class="admin-menu-link flex items-center gap-xs px-md py-sm text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors duration-200 cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Stock Listings</span>
+</a>
+</nav>
+<div class="mt-auto px-sm pt-md border-t border-white/5 space-y-1">
+<a data-admin-menu="settings" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'settings')" class="admin-menu-link flex items-center gap-xs px-md py-sm text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors duration-200 cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+<a id="adminLogoutBtn" class="flex items-center gap-xs px-md py-sm text-error font-medium hover:bg-error/5 transition-colors duration-200 cursor-pointer" href="javascript:void(0)">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Logout</span>
+</a>
+<div class="mt-md px-md">
+<button class="w-full py-sm bg-primary/10 border border-primary/20 text-primary rounded-lg font-label-sm hover:bg-primary/20 transition-all">
+                    Support Desk
+                </button>
+</div>
+</div>
+</aside>
+<!-- Main Wrapper -->
+<div class="ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full pr-md h-16 sticky top-0 z-50 bg-surface-container/80 backdrop-blur-xl border-b border-white/10">
+<div class="flex items-center px-lg w-1/2">
+<div class="relative w-full max-w-md focus-within:ring-1 focus-within:ring-primary rounded-lg transition-all">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="bg-surface-container-lowest border-none w-full pl-10 pr-4 py-2 rounded-lg text-body-md focus:outline-none placeholder:text-on-surface-variant/40" placeholder="Search users, stocks, or transactions..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-white/10 mx-xs"></div>
+<div class="flex items-center gap-sm cursor-pointer group">
+<div class="text-right">
+<p class="font-label-sm text-on-surface">Admin Utama</p>
+<p class="text-[10px] text-primary">Super Admin</p>
+</div>
+<img alt="Admin Profile" class="w-10 h-10 rounded-full border border-primary/20 group-hover:border-primary transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdHzKBjvsjpuHKs-rfJy3cYSCkTioyt4KAQ5f8rOrQxiyz_YDxFRqTWOklMRZFGMdKayjMl-Rxj59acXyoyi1O0qudgmY9V26HL7BTHeUyXZySA-N5K6NnaYbtH8QTh8cvoKLSNYU4lbvFzMuVhOijGm4yM3MN7AW-8SLM0PIwGxX7ou4V7XenJ5O9v7c6Ru3mn7Et7CmqB7VhhTdAK0bKcyKjUQPntCpDnshFosxMtJBB_BvwcxzzaOYoc6EGYdcxMgqFTvnurvtr"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="p-lg space-y-lg max-w-[1600px] mx-auto w-full">
+<!-- Dashboard Section -->
+<div id="adminDashboardSection" class="admin-section">
+<!-- Dashboard Header & Status -->
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-headline-lg">Enterprise Dashboard</h2>
+<div class="flex items-center gap-xs text-on-surface-variant/60 font-label-sm mt-xs">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span>Live Market Connection: Stable (12ms)</span>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="flex items-center gap-xs px-md py-sm bg-surface-container text-on-surface border border-white/5 rounded-lg font-label-sm hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="calendar_today">calendar_today</span>
+                        Last 24 Hours
+                    </button>
+<button class="flex items-center gap-xs px-md py-sm bg-primary text-on-primary rounded-lg font-label-sm hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+                        Export Report
+                    </button>
+</div>
+</div>
+<!-- Analytics Overview Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-md">
+<div class="glass-card p-md rounded-xl">
+<p class="text-on-surface-variant font-label-sm">Total Users</p>
+<div class="flex items-baseline gap-xs mt-sm">
+<span class="font-headline-md text-headline-md font-bold">125.4k</span>
+<span class="text-primary text-xs">+12%</span>
+</div>
+<div class="w-full h-1 bg-white/5 mt-md rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[85%]"></div>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl">
+<p class="text-on-surface-variant font-label-sm">Active Traders</p>
+<div class="flex items-baseline gap-xs mt-sm">
+<span class="font-headline-md text-headline-md font-bold text-primary">8.2k</span>
+<span class="text-on-surface-variant text-xs">Live</span>
+</div>
+<div class="w-full h-1 bg-white/5 mt-md rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[40%]"></div>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl">
+<p class="text-on-surface-variant font-label-sm">Total Transactions</p>
+<div class="flex items-baseline gap-xs mt-sm">
+<span class="font-headline-md text-headline-md font-bold">45.2k</span>
+<span class="text-primary text-xs">+5.4k</span>
+</div>
+<div class="w-full h-1 bg-white/5 mt-md rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[65%]"></div>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl">
+<p class="text-on-surface-variant font-label-sm">Daily Volume</p>
+<div class="flex items-baseline gap-xs mt-sm">
+<span class="font-headline-md text-headline-md font-bold">Rp 850B</span>
+</div>
+<div class="w-full h-1 bg-white/5 mt-md rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[92%]"></div>
+</div>
+</div>
+<div class="glass-card p-md rounded-xl border-primary/20">
+<p class="text-on-surface-variant font-label-sm">Platform Revenue</p>
+<div class="flex items-baseline gap-xs mt-sm">
+<span class="font-headline-md text-headline-md font-bold text-primary">Rp 1.2B</span>
+</div>
+<div class="w-full h-1 bg-white/5 mt-md rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[78%] shadow-[0_0_8px_rgba(78,222,163,0.5)]"></div>
+</div>
+</div>
+</div>
+<!-- Market Chart & Side Panels -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-lg">
+<!-- Large Volume Chart -->
+<div class="lg:col-span-3 glass-card rounded-xl p-lg flex flex-col">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-md text-headline-md">Financial Analytics</h3>
+<div class="flex gap-xs bg-surface-container rounded-lg p-1">
+<button class="px-3 py-1 text-xs font-label-sm bg-primary/10 text-primary rounded shadow-sm">1D</button>
+<button class="px-3 py-1 text-xs font-label-sm text-on-surface-variant hover:text-on-surface">1W</button>
+<button class="px-3 py-1 text-xs font-label-sm text-on-surface-variant hover:text-on-surface">1M</button>
+<button class="px-3 py-1 text-xs font-label-sm text-on-surface-variant hover:text-on-surface">1Y</button>
+</div>
+</div>
+<div class="flex-1 min-h-[300px] relative chart-gradient rounded-lg border border-primary/5">
+<!-- Simulated Chart Grid -->
+<div class="absolute inset-0 grid grid-cols-8 grid-rows-4 pointer-events-none opacity-20">
+<div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-b border-white/10"></div>
+<div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-b border-white/10"></div>
+<div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-r border-b border-white/10"></div><div class="border-b border-white/10"></div>
+<div class="border-r border-white/10"></div><div class="border-r border-white/10"></div><div class="border-r border-white/10"></div><div class="border-r border-white/10"></div><div class="border-r border-white/10"></div><div class="border-r border-white/10"></div><div class="border-r border-white/10"></div><div></div>
+</div>
+<!-- Decorative SVG Path for Chart -->
+<svg class="absolute inset-0 w-full h-full p-4" preserveaspectratio="none" viewbox="0 0 1000 300">
+<path d="M0,250 L100,220 L200,240 L300,180 L400,200 L500,120 L600,150 L700,80 L800,100 L900,40 L1000,60" fill="none" stroke="#4edea3" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+<path d="M0,250 L100,220 L200,240 L300,180 L400,200 L500,120 L600,150 L700,80 L800,100 L900,40 L1000,60 L1000,300 L0,300 Z" fill="url(#grad1)" opacity="0.3"></path>
+<defs>
+<lineargradient id="grad1" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#4edea3;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#4edea3;stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+</svg>
+<div class="absolute bottom-4 left-4 right-4 flex justify-between font-label-sm text-on-surface-variant/40">
+<span>08:00 AM</span><span>11:00 AM</span><span>02:00 PM</span><span>05:00 PM</span>
+</div>
+</div>
+</div>
+<!-- Market Monitoring (Gainers/Losers) -->
+<div class="space-y-lg">
+<div class="glass-card rounded-xl p-md">
+<div class="flex justify-between items-center mb-md">
+<h4 class="font-headline-md text-[18px]">Top Gainers</h4>
+<span class="material-symbols-outlined text-primary text-sm" data-icon="trending_up">trending_up</span>
+</div>
+<div class="space-y-md">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold font-data-tabular">BBCA</p>
+<p class="text-[10px] text-on-surface-variant">Bank Central Asia</p>
+</div>
+<div class="text-right">
+<p class="text-primary font-bold">+2.45%</p>
+<div class="w-16 h-4 opacity-50">
+<svg class="w-full h-full" viewbox="0 0 100 20"><polyline fill="none" points="0,20 20,15 40,18 60,10 80,12 100,2" stroke="#4edea3" stroke-width="2"></polyline></svg>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold font-data-tabular">GOTO</p>
+<p class="text-[10px] text-on-surface-variant">GoTo Gojek Tokopedia</p>
+</div>
+<div class="text-right">
+<p class="text-primary font-bold">+1.82%</p>
+<div class="w-16 h-4 opacity-50">
+<svg class="w-full h-full" viewbox="0 0 100 20"><polyline fill="none" points="0,15 25,18 50,12 75,14 100,5" stroke="#4edea3" stroke-width="2"></polyline></svg>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-xl p-md">
+<div class="flex justify-between items-center mb-md">
+<h4 class="font-headline-md text-[18px]">Top Losers</h4>
+<span class="material-symbols-outlined text-error text-sm" data-icon="trending_down">trending_down</span>
+</div>
+<div class="space-y-md">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold font-data-tabular">TLKM</p>
+<p class="text-[10px] text-on-surface-variant">Telkom Indonesia</p>
+</div>
+<div class="text-right">
+<p class="text-error font-bold">-3.12%</p>
+<div class="w-16 h-4 opacity-50">
+<svg class="w-full h-full" viewbox="0 0 100 20"><polyline fill="none" points="0,2 30,12 60,10 80,18 100,20" stroke="#ffb4ab" stroke-width="2"></polyline></svg>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-bold font-data-tabular">ADRO</p>
+<p class="text-[10px] text-on-surface-variant">Adaro Energy</p>
+</div>
+<div class="text-right">
+<p class="text-error font-bold">-2.05%</p>
+<div class="w-16 h-4 opacity-50">
+<svg class="w-full h-full" viewbox="0 0 100 20"><polyline fill="none" points="0,5 25,8 50,15 75,12 100,18" stroke="#ffb4ab" stroke-width="2"></polyline></svg>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Table and Secondary Panels -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-lg">
+<!-- Trading Activity Table -->
+<div class="xl:col-span-2 glass-card rounded-xl overflow-hidden">
+<div class="p-md border-b border-white/5 flex justify-between items-center">
+<h3 class="font-headline-md text-[20px]">Recent Trading Activity</h3>
+<button class="text-primary font-label-sm hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left font-label-sm">
+<thead class="bg-surface-container-low text-on-surface-variant/70 uppercase">
+<tr>
+<th class="px-md py-sm">User</th>
+<th class="px-md py-sm">Stock</th>
+<th class="px-md py-sm">Side</th>
+<th class="px-md py-sm">Price</th>
+<th class="px-md py-sm">Lot</th>
+<th class="px-md py-sm">Value</th>
+<th class="px-md py-sm">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5 font-data-tabular">
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-md py-md flex items-center gap-xs">
+<img alt="User Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrA3fKz_f562IZC3cCNbGcfpf34PI4R6LqrfE7Oa1Z0CoD96Lg4U2k1Y1bvUycOf8LMeYPbrV43gUbJbh2hZJgOEB0zapOxtdX1QJc2_LA-DiVJYlXWM6QkYKKJFiqRooj23ef7NpTinve549STrZg-4kkvElEzRgg08UyC_htXM6TW5yVxHg09LhMu1R-KhJgKq8qtEDCtnfrk1nvB1BMciPb0BuajudE0WdtjjEvyvZDDFDncWc6qiL8OEMVJErCBWxLw6gGB7lE"/>
+<span>Budi S.</span>
+</td>
+<td class="px-md py-md font-bold">BBRI</td>
+<td class="px-md py-md"><span class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/20">BUY</span></td>
+<td class="px-md py-md">5,250</td>
+<td class="px-md py-md">150</td>
+<td class="px-md py-md">Rp 78.7M</td>
+<td class="px-md py-md">
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+                                            Completed
+                                        </span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-md py-md flex items-center gap-xs">
+<img alt="User Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBf3q2wPlgpzCa8Jbrm4dSG2wZKBKyCEJ9y9oNiVw5dLH3YYdmKFGRenZnRqDd9yaDi-D230AcKeS3GoGXMOlpJ0JpsOWXnXWLz4uBlfZmRnPrbqE6DFDG9znmtktZh6XplxptubbknMR8JyVC4xyjdyksB6viBmRVd1ECnoug6bx6sIxmX5qxw6ZE0h1k8IuYAIkNv9ylJFeV8FGFXBjTM3h5PS3elcCUTvFZki2msgvrS9nOCaaVTMiKl-tnWL5w4OVQJNEjtSnEQ"/>
+<span>Ani W.</span>
+</td>
+<td class="px-md py-md font-bold">ASII</td>
+<td class="px-md py-md"><span class="bg-error/20 text-error px-2 py-0.5 rounded border border-error/20">SELL</span></td>
+<td class="px-md py-md">6,125</td>
+<td class="px-md py-md">42</td>
+<td class="px-md py-md">Rp 25.7M</td>
+<td class="px-md py-md">
+<span class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span>
+                                            Pending
+                                        </span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-md py-md flex items-center gap-xs">
+<img alt="User Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBR3rMITB4wZliGoi56M0H0Lna8gqiY7uCwAPMKqpNQAp_FA4pl26FWO_DBLv0dlZYQqXBEnsz4YzMEsqnt87f9hidiqpjrIIC2XYk-hR_-FXFJ-MDuVIGckgGtv4wpBUANrksqROYNTOSf66SD56OAcIeT42lC0uVWvekLxHLCqD_g6YbVEf5jpwcwkiRBkPaIR3OMmogUVhOawobj1kPFprsmVV72IpikPpNKzrMTpZVOBK9kY-Y_UcjbC8e3buxuTTHGc2LmWh_k"/>
+<span>Reza F.</span>
+</td>
+<td class="px-md py-md font-bold">BBNI</td>
+<td class="px-md py-md"><span class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/20">BUY</span></td>
+<td class="px-md py-md">5,400</td>
+<td class="px-md py-md">500</td>
+<td class="px-md py-md">Rp 270M</td>
+<td class="px-md py-md">
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+                                            Completed
+                                        </span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-md py-md flex items-center gap-xs">
+<img alt="User Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAII6ht459EGjm4jxPthMK3CnYekV5utA7pIqwwu9Rq93zlb0hUAi8cORCK5vwmBWlqTrJ2Ic6_S-ki_x2bUaRiPXYjh2cD2Dser9JvPUb7znXAgh2QdljY7yCR19gTJtNoNteRPKV_KSmoH_d19ZFUHHN6IDTWzBmTVh0W1EUZ19lY_xzxfc4wqjP6gkhCQEZeS4eKoYZLt0MEpqKK_sxTA1WTYu83LC_Iv_4InO0baYqorDhr688cC_85ko_VWOCt2HOQlEHv77lK"/>
+<span>Citra D.</span>
+</td>
+<td class="px-md py-md font-bold">UNVR</td>
+<td class="px-md py-md"><span class="bg-error/20 text-error px-2 py-0.5 rounded border border-error/20">SELL</span></td>
+<td class="px-md py-md">3,850</td>
+<td class="px-md py-md">10</td>
+<td class="px-md py-md">Rp 3.8M</td>
+<td class="px-md py-md">
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+                                            Completed
+                                        </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Column: KYC & Finance -->
+<div class="space-y-lg">
+<!-- User Management & KYC -->
+<div class="glass-card rounded-xl overflow-hidden">
+<div class="p-md border-b border-white/5 bg-surface-container-low">
+<h3 class="font-headline-md text-[18px]">KYC Verifications</h3>
+</div>
+<div class="p-md space-y-md">
+<div class="flex items-center justify-between group">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="person">person</span>
+</div>
+<div>
+<p class="font-bold text-sm">Pratama Putra</p>
+<p class="text-[10px] text-on-surface-variant">ID: #88291</p>
+</div>
+</div>
+<div class="flex gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]" data-icon="check">check</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between group">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="person">person</span>
+</div>
+<div>
+<p class="font-bold text-sm">Dewi Lestari</p>
+<p class="text-[10px] text-on-surface-variant">ID: #88295</p>
+</div>
+</div>
+<div class="flex gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]" data-icon="check">check</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<button class="w-full py-sm border border-white/5 rounded-lg text-xs font-label-sm hover:bg-white/5 transition-all">Review All Submissions (12)</button>
+</div>
+</div>
+<!-- Deposit & Withdrawal Monitoring -->
+<div class="glass-card rounded-xl overflow-hidden">
+<div class="p-md border-b border-white/5 bg-surface-container-low">
+<h3 class="font-headline-md text-[18px]">Financial Operations</h3>
+</div>
+<div class="p-md space-y-md">
+<div class="flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="account_balance">account_balance</span>
+<span class="font-label-sm">Pending Deposits</span>
+</div>
+<span class="font-bold text-primary font-data-tabular">Rp 2.4B</span>
+</div>
+<div class="flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-error text-[20px]" data-icon="outbox">outbox</span>
+<span class="font-label-sm">Pending Withdrawals</span>
+</div>
+<span class="font-bold text-error font-data-tabular">Rp 842M</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+<div class="glass-card rounded-xl overflow-hidden">
+<div class="p-md border-b border-white/5 bg-surface-container-low flex items-center justify-between">
+<div>
+<h3 class="font-headline-md text-[18px]">Stock Management</h3>
+<p class="text-label-sm text-on-surface-variant">Tambahkan atau perbarui saham program</p>
+</div>
+<button onclick="createStock()" class="rounded-lg bg-primary text-on-primary px-4 py-2 text-[12px] font-bold hover:bg-primary/90">Tambah Saham</button>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left text-label-sm">
+<thead class="text-on-surface-variant text-[10px] uppercase tracking-[0.08em]">
+<tr>
+<th class="px-4 py-3">Kode</th>
+<th class="px-4 py-3">Nama</th>
+<th class="px-4 py-3">Harga</th>
+<th class="px-4 py-3">Volume</th>
+<th class="px-4 py-3">Aksi</th>
+</tr>
+</thead>
+<tbody data-table="stocks" class="divide-y divide-white/5 font-data-tabular"></tbody>
+</table>
+</div>
+</div>
+<div class="glass-card rounded-xl overflow-hidden">
+<div class="p-md border-b border-white/5 bg-surface-container-low flex items-center justify-between">
+<div>
+<h3 class="font-headline-md text-[18px]">User Management</h3>
+<p class="text-label-sm text-on-surface-variant">Kelola pelanggan dan saldo</p>
+</div>
+</div>
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left text-label-sm">
+<thead class="text-on-surface-variant text-[10px] uppercase tracking-[0.08em]">
+<tr>
+<th class="px-4 py-3">Nama</th>
+<th class="px-4 py-3">Email</th>
+<th class="px-4 py-3">Saldo</th>
+<th class="px-4 py-3">Role</th>
+<th class="px-4 py-3">Aksi</th>
+</tr>
+</thead>
+<tbody data-table="users" class="divide-y divide-white/5 font-data-tabular"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Users Section -->
+<div id="adminUsersSection" class="admin-section p-lg" style="display: none;">
+<h2 class="font-headline-lg mb-6">User Management</h2>
+<div class="overflow-x-auto">
+<table class="w-full text-label-sm">
+<thead class="text-on-surface-variant text-[10px] uppercase">
+<tr><th class="px-4 py-3 text-left">Nama</th><th class="px-4 py-3 text-left">Email</th><th class="px-4 py-3 text-left">Saldo</th><th class="px-4 py-3 text-left">Role</th><th class="px-4 py-3 text-left">Aksi</th></tr>
+</thead>
+<tbody id="adminUsersTable" class="divide-y divide-white/5"></tbody>
+</table>
+</div>
+</div>
+
+<!-- Trading Section -->
+<div id="adminTradingSection" class="admin-section p-lg" style="display: none;">
+<h2 class="font-headline-lg mb-6">Trading Activity</h2>
+<div class="overflow-x-auto">
+<table class="w-full text-label-sm">
+<thead class="text-on-surface-variant text-[10px] uppercase">
+<tr><th class="px-4 py-3 text-left">User</th><th class="px-4 py-3 text-left">Saham</th><th class="px-4 py-3 text-left">Tipe</th><th class="px-4 py-3 text-left">Qty</th><th class="px-4 py-3 text-left">Total</th><th class="px-4 py-3 text-left">Waktu</th></tr>
+</thead>
+<tbody id="adminTradingTable" class="divide-y divide-white/5"></tbody>
+</table>
+</div>
+</div>
+
+<!-- Stocks Section -->
+<div id="adminStocksSection" class="admin-section p-lg" style="display: none;">
+<h2 class="font-headline-lg mb-6">Stock Listings</h2>
+<button onclick="createStock()" class="mb-4 px-4 py-2 bg-primary text-on-primary rounded-lg font-label-sm">Tambah Saham</button>
+<div class="overflow-x-auto">
+<table class="w-full text-label-sm">
+<thead class="text-on-surface-variant text-[10px] uppercase">
+<tr><th class="px-4 py-3 text-left">Kode</th><th class="px-4 py-3 text-left">Nama</th><th class="px-4 py-3 text-left">Harga</th><th class="px-4 py-3 text-left">Volume</th><th class="px-4 py-3 text-left">Aksi</th></tr>
+</thead>
+<tbody id="adminStocksTable" class="divide-y divide-white/5"></tbody>
+</table>
+</div>
+</div>
+
+<!-- Deposits Section -->
+<div id="adminDepositsSection" class="admin-section p-lg" style="display: none;">
+<h2 class="font-headline-lg mb-6">Deposits &amp; Withdrawals</h2>
+<div class="glass-card rounded-xl overflow-hidden mb-6">
+<div class="p-md border-b border-white/5 bg-surface-container-low"><h3 class="font-headline-md text-[18px]">Deposit Requests</h3><p class="text-label-sm text-on-surface-variant">Kelola request deposit dan penarikan</p></div>
+<div class="overflow-x-auto custom-scrollbar"><table class="w-full text-label-sm"><thead class="text-on-surface-variant text-[10px] uppercase"><tr><th class="px-4 py-3">User</th><th class="px-4 py-3">Amount</th><th class="px-4 py-3">Method</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Date</th><th class="px-4 py-3">Action</th></tr></thead><tbody id="adminDepositsTable" class="divide-y divide-white/5"></tbody></table></div>
+</div>
+</div>
+
+<div id="adminMonitoringSection" class="admin-section p-lg" style="display: none;">
+<h2 class="font-headline-lg mb-6">Market Monitoring</h2>
+<div class="glass-card rounded-xl overflow-hidden mb-6">
+<div class="p-md border-b border-white/5 bg-surface-container-low"><h3 class="font-headline-md text-[18px]">Market Indices</h3><p class="text-label-sm text-on-surface-variant">Pantau indeks pasar secara real-time</p></div>
+<div class="overflow-x-auto custom-scrollbar"><table class="w-full text-label-sm"><thead class="text-on-surface-variant text-[10px] uppercase"><tr><th class="px-4 py-3">Index</th><th class="px-4 py-3">Value</th><th class="px-4 py-3">Change</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Action</th></tr></thead><tbody id="adminMonitoringTable" class="divide-y divide-white/5"></tbody></table></div>
+</div>
+<div class="glass-card rounded-xl overflow-hidden">
+<div class="p-md border-b border-white/5 bg-surface-container-low"><h3 class="font-headline-md text-[18px]">Stock Prices</h3><p class="text-label-sm text-on-surface-variant">Kelola harga saham</p></div>
+<div class="overflow-x-auto custom-scrollbar"><table class="w-full text-label-sm"><thead class="text-on-surface-variant text-[10px] uppercase"><tr><th class="px-4 py-3">Code</th><th class="px-4 py-3">Company</th><th class="px-4 py-3">Price</th><th class="px-4 py-3">Change</th><th class="px-4 py-3">Volume</th><th class="px-4 py-3">Action</th></tr></thead><tbody id="adminStocksMonitoringTable" class="divide-y divide-white/5"></tbody></table></div>
+</div>
+</div>
+
+<div id="adminSettingsSection" class="admin-section p-lg" style="display: none;">
+<h2 class="font-headline-lg mb-6">Admin Settings</h2>
+<div class="glass-card p-5 rounded-xl space-y-6">
+<div>
+<h3 class="font-bold mb-2">Pengaturan Platform</h3>
+<p class="text-label-sm text-on-surface-variant mb-4">Biaya transaksi: 0.15%</p>
+<button class="px-4 py-2 bg-primary/10 border border-primary/20 text-primary rounded-lg">Ubah Pengaturan</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Aesthetic Floating Element -->
+<div class="fixed bottom-lg right-lg z-[100]">
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform cursor-pointer">
+<span class="material-symbols-outlined text-[28px]" data-icon="support_agent">support_agent</span>
+</button>
+</div>
+</div>
+<!-- Background Atmospheric Effect -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full"></div>
+<div class="absolute top-[40%] -right-[10%] w-[30%] h-[50%] bg-primary/3 blur-[120px] rounded-full"></div>
+</div>
+<script>
+        // Micro-interactions for live data updates (simulated)
+        function updateLiveValues() {
+            const tickers = document.querySelectorAll('.font-data-tabular');
+            tickers.forEach(ticker => {
+                if(Math.random() > 0.8) {
+                    ticker.classList.add('opacity-50');
+                    setTimeout(() => ticker.classList.remove('opacity-50'), 200);
+                }
+            });
+        }
+        setInterval(updateLiveValues, 3000);
+
+        // Sidebar scroll locking
+        const sidebar = document.querySelector('aside');
+        sidebar.addEventListener('wheel', (e) => {
+            sidebar.scrollTop += e.deltaY;
+            e.preventDefault();
+        });
+    </script>
+    <script src="/client/js/api.js"></script>
+    <script src="/client/js/auth.js"></script>
+    <script src="/client/js/dashboard.js"></script>
+</body></html>

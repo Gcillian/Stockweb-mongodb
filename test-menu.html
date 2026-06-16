@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Menu Test - NusaTrade</title>
+<style>
+body { font-family: monospace; background: #131313; color: #e5e2e1; padding: 24px; }
+.section-content { padding: 16px; margin: 8px 0; background: #201f1f; border: 1px solid #333; border-radius: 8px; }
+.section-content.hidden { display: none; }
+.menu-link { display: inline-block; padding: 8px 16px; margin: 4px; background: #2a2a2a; border-radius: 6px; cursor: pointer; color: #4edea3; text-decoration: none; }
+.menu-link:hover { background: #353534; }
+.menu-link.active { background: #4edea3; color: #003824; font-weight: bold; }
+h1 { color: #4edea3; }
+#log { background: #000; padding: 12px; border-radius: 6px; max-height: 300px; overflow: auto; font-size: 12px; }
+.log-line { color: #4edea3; }
+.log-line.error { color: #ffb4ab; }
+</style>
+</head>
+<body>
+<h1>🧪 NusaTrade Menu Test Page</h1>
+<p>Halaman ini mensimulasikan menu dashboard untuk testing apakah event listener terpasang dengan benar.</p>
+
+<h2>User Menu Test</h2>
+<nav>
+  <a data-menu="dashboard" class="menu-link" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'dashboard')">Dashboard</a>
+  <a data-menu="markets" class="menu-link" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'markets')">Pasar Saham</a>
+  <a data-menu="watchlist" class="menu-link" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'watchlist')">Watchlist</a>
+  <a data-menu="portfolio" class="menu-link" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'portfolio')">Portfolio</a>
+  <a data-menu="history" class="menu-link" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'history')">Riwayat</a>
+  <a data-menu="settings" class="menu-link" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'settings')">Setelan</a>
+  <a data-menu="help" class="menu-link" onclick="window.__nusatradeMenuClick && window.__nusatradeMenuClick(this, 'help')">Bantuan</a>
+</nav>
+
+<div id="dashboardSection" class="section-content">📊 Dashboard Section</div>
+<div id="marketsSection" class="section-content hidden">📈 Markets Section</div>
+<div id="watchlistSection" class="section-content hidden">⭐ Watchlist Section</div>
+<div id="portfolioSection" class="section-content hidden">💼 Portfolio Section</div>
+<div id="historySection" class="section-content hidden">📜 History Section</div>
+<div id="settingsSection" class="section-content hidden">⚙️ Settings Section</div>
+<div id="helpSection" class="section-content hidden">❓ Help Section</div>
+
+<h2>Admin Menu Test</h2>
+<nav>
+  <a data-admin-menu="dashboard" class="admin-menu-link menu-link" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'dashboard')">Admin Dashboard</a>
+  <a data-admin-menu="users" class="admin-menu-link menu-link" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'users')">Users</a>
+  <a data-admin-menu="trading" class="admin-menu-link menu-link" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'trading')">Trading</a>
+  <a data-admin-menu="deposits" class="admin-menu-link menu-link" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'deposits')">Deposits</a>
+  <a data-admin-menu="monitoring" class="admin-menu-link menu-link" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'monitoring')">Monitoring</a>
+  <a data-admin-menu="stocks" class="admin-menu-link menu-link" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'stocks')">Stocks</a>
+  <a data-admin-menu="settings" class="admin-menu-link menu-link" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'settings')">Settings</a>
+</nav>
+
+<div id="adminDashboardSection" class="admin-section section-content">🛡️ Admin Dashboard</div>
+<div id="adminUsersSection" class="admin-section section-content hidden">👥 Admin Users</div>
+<div id="adminTradingSection" class="admin-section section-content hidden">💱 Admin Trading</div>
+<div id="adminDepositsSection" class="admin-section section-content hidden">💰 Admin Deposits</div>
+<div id="adminMonitoringSection" class="admin-section section-content hidden">📡 Admin Monitoring</div>
+<div id="adminStocksSection" class="admin-section section-content hidden">📊 Admin Stocks</div>
+<div id="adminSettingsSection" class="admin-section section-content hidden">🔧 Admin Settings</div>
+
+<h2>Status</h2>
+<pre id="log"></pre>
+
+<script>
+// Load actual dashboard.js
+</script>
+<script src="/client/js/api.js"></script>
+<script src="/client/js/dashboard.js"></script>
+<script>
+const log = document.getElementById('log');
+function addLog(msg, isError = false) {
+  const line = document.createElement('div');
+  line.className = 'log-line' + (isError ? ' error' : '');
+  line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+// Run checks after page loads
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    addLog('Page loaded. Checking menu handlers...');
+    addLog('window.__nusatradeMenuClick: ' + (typeof window.__nusatradeMenuClick));
+    addLog('window.__nusatradeAdminMenuClick: ' + (typeof window.__nusatradeAdminMenuClick));
+
+    // Check if sections found
+    const userSections = ['dashboardSection', 'marketsSection', 'watchlistSection', 'portfolioSection', 'historySection', 'settingsSection', 'helpSection'];
+    const adminSections = ['adminDashboardSection', 'adminUsersSection', 'adminTradingSection', 'adminDepositsSection', 'adminMonitoringSection', 'adminStocksSection', 'adminSettingsSection'];
+
+    addLog('--- User sections ---');
+    userSections.forEach(id => {
+      const el = document.getElementById(id);
+      addLog((el ? '✓' : '✗') + ' ' + id);
+    });
+    addLog('--- Admin sections ---');
+    adminSections.forEach(id => {
+      const el = document.getElementById(id);
+      addLog((el ? '✓' : '✗') + ' ' + id);
+    });
+
+    if (typeof window.__nusatradeMenuClick === 'function') {
+      addLog('✅ User menu handler is READY — try clicking above!');
+    } else {
+      addLog('❌ User menu handler NOT registered', true);
+    }
+    if (typeof window.__nusatradeAdminMenuClick === 'function') {
+      addLog('✅ Admin menu handler is READY — try clicking above!');
+    } else {
+      addLog('❌ Admin menu handler NOT registered', true);
+    }
+  }, 500);
+});
+</script>
+</body>
+</html>
