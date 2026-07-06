@@ -630,74 +630,174 @@
 </div>
 
 <!-- Users Section -->
-<div id="adminUsersSection" class="admin-section p-lg" style="display: none;">
-<h2 class="font-headline-lg mb-6">User Management</h2>
-<div class="overflow-x-auto">
-<table class="w-full text-label-sm">
-<thead class="text-on-surface-variant text-[10px] uppercase">
-<tr><th class="px-4 py-3 text-left">Nama</th><th class="px-4 py-3 text-left">Email</th><th class="px-4 py-3 text-left">Saldo</th><th class="px-4 py-3 text-left">Role</th><th class="px-4 py-3 text-left">Aksi</th></tr>
-</thead>
-<tbody id="adminUsersTable" class="divide-y divide-white/5"></tbody>
-</table>
+<div id="adminUsersSection" class="admin-section hidden p-lg">
+<div class="flex items-center justify-between mb-6">
+  <h2 class="font-headline-lg text-headline-lg">User Management</h2>
+  <div class="flex items-center gap-2 text-label-sm text-on-surface-variant">
+    <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+    <span id="adminUsersCount">Memuat...</span>
+  </div>
+</div>
+<div class="glass-card rounded-xl overflow-hidden">
+  <div class="p-md border-b border-white/5 bg-surface-container-low flex justify-between items-center">
+    <p class="font-label-sm text-on-surface-variant">Daftar seluruh pengguna terdaftar</p>
+    <input id="usersSearchInput" type="text" placeholder="Cari nama / email..." class="bg-surface-container border border-white/10 rounded-lg px-3 py-1.5 text-label-sm w-56 focus:outline-none focus:border-primary transition-colors"/>
+  </div>
+  <div class="overflow-x-auto custom-scrollbar">
+    <table class="w-full text-left text-label-sm">
+      <thead class="bg-surface-container-low text-on-surface-variant text-[10px] uppercase tracking-[0.08em]">
+        <tr>
+          <th class="px-4 py-3">Nama</th>
+          <th class="px-4 py-3">Email</th>
+          <th class="px-4 py-3">Saldo</th>
+          <th class="px-4 py-3">Role</th>
+          <th class="px-4 py-3">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="adminUsersTable" class="divide-y divide-white/5 font-data-tabular"></tbody>
+    </table>
+  </div>
 </div>
 </div>
 
 <!-- Trading Section -->
-<div id="adminTradingSection" class="admin-section p-lg" style="display: none;">
-<h2 class="font-headline-lg mb-6">Trading Activity</h2>
-<div class="overflow-x-auto">
-<table class="w-full text-label-sm">
-<thead class="text-on-surface-variant text-[10px] uppercase">
-<tr><th class="px-4 py-3 text-left">User</th><th class="px-4 py-3 text-left">Saham</th><th class="px-4 py-3 text-left">Tipe</th><th class="px-4 py-3 text-left">Qty</th><th class="px-4 py-3 text-left">Total</th><th class="px-4 py-3 text-left">Waktu</th></tr>
-</thead>
-<tbody id="adminTradingTable" class="divide-y divide-white/5"></tbody>
-</table>
+<div id="adminTradingSection" class="admin-section hidden p-lg">
+<div class="flex items-center justify-between mb-6">
+  <h2 class="font-headline-lg text-headline-lg">Trading Activity</h2>
+  <span class="text-label-sm text-on-surface-variant" id="adminTradingCount">Memuat...</span>
+</div>
+<div class="glass-card rounded-xl overflow-hidden">
+  <div class="p-md border-b border-white/5 bg-surface-container-low">
+    <p class="font-label-sm text-on-surface-variant">Seluruh riwayat transaksi pengguna</p>
+  </div>
+  <div class="overflow-x-auto custom-scrollbar">
+    <table class="w-full text-left text-label-sm">
+      <thead class="bg-surface-container-low text-on-surface-variant text-[10px] uppercase tracking-[0.08em]">
+        <tr>
+          <th class="px-4 py-3">User</th>
+          <th class="px-4 py-3">Saham</th>
+          <th class="px-4 py-3">Tipe</th>
+          <th class="px-4 py-3">Qty (saham)</th>
+          <th class="px-4 py-3">Total</th>
+          <th class="px-4 py-3">Waktu</th>
+        </tr>
+      </thead>
+      <tbody id="adminTradingTable" class="divide-y divide-white/5 font-data-tabular"></tbody>
+    </table>
+  </div>
 </div>
 </div>
 
 <!-- Stocks Section -->
-<div id="adminStocksSection" class="admin-section p-lg" style="display: none;">
-<h2 class="font-headline-lg mb-6">Stock Listings</h2>
-<button onclick="createStock()" class="mb-4 px-4 py-2 bg-primary text-on-primary rounded-lg font-label-sm">Tambah Saham</button>
-<div class="overflow-x-auto">
-<table class="w-full text-label-sm">
-<thead class="text-on-surface-variant text-[10px] uppercase">
-<tr><th class="px-4 py-3 text-left">Kode</th><th class="px-4 py-3 text-left">Nama</th><th class="px-4 py-3 text-left">Harga</th><th class="px-4 py-3 text-left">Volume</th><th class="px-4 py-3 text-left">Aksi</th></tr>
-</thead>
-<tbody id="adminStocksTable" class="divide-y divide-white/5"></tbody>
-</table>
+<div id="adminStocksSection" class="admin-section hidden p-lg">
+<div class="flex items-center justify-between mb-6">
+  <h2 class="font-headline-lg text-headline-lg">Stock Listings</h2>
+  <button onclick="createStock()" class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg font-label-sm font-bold hover:opacity-90 transition-all active:scale-95">
+    <span class="material-symbols-outlined text-[16px]">add</span> Tambah Saham
+  </button>
+</div>
+<div class="glass-card rounded-xl overflow-hidden">
+  <div class="p-md border-b border-white/5 bg-surface-container-low">
+    <p class="font-label-sm text-on-surface-variant">Daftar saham yang tersedia di platform</p>
+  </div>
+  <div class="overflow-x-auto custom-scrollbar">
+    <table class="w-full text-left text-label-sm">
+      <thead class="bg-surface-container-low text-on-surface-variant text-[10px] uppercase tracking-[0.08em]">
+        <tr>
+          <th class="px-4 py-3">Kode</th>
+          <th class="px-4 py-3">Nama Perusahaan</th>
+          <th class="px-4 py-3">Harga</th>
+          <th class="px-4 py-3">Volume</th>
+          <th class="px-4 py-3">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="adminStocksTable" class="divide-y divide-white/5 font-data-tabular"></tbody>
+    </table>
+  </div>
 </div>
 </div>
 
 <!-- Deposits Section -->
-<div id="adminDepositsSection" class="admin-section p-lg" style="display: none;">
-<h2 class="font-headline-lg mb-6">Deposits &amp; Withdrawals</h2>
-<div class="glass-card rounded-xl overflow-hidden mb-6">
-<div class="p-md border-b border-white/5 bg-surface-container-low"><h3 class="font-headline-md text-[18px]">Deposit Requests</h3><p class="text-label-sm text-on-surface-variant">Kelola request deposit dan penarikan</p></div>
-<div class="overflow-x-auto custom-scrollbar"><table class="w-full text-label-sm"><thead class="text-on-surface-variant text-[10px] uppercase"><tr><th class="px-4 py-3">User</th><th class="px-4 py-3">Amount</th><th class="px-4 py-3">Method</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Date</th><th class="px-4 py-3">Action</th></tr></thead><tbody id="adminDepositsTable" class="divide-y divide-white/5"></tbody></table></div>
+<div id="adminDepositsSection" class="admin-section hidden p-lg">
+<h2 class="font-headline-lg text-headline-lg mb-6">Deposits &amp; Withdrawals</h2>
+<div class="glass-card rounded-xl overflow-hidden">
+  <div class="p-md border-b border-white/5 bg-surface-container-low">
+    <h3 class="font-headline-md text-[18px]">Deposit Requests</h3>
+    <p class="text-label-sm text-on-surface-variant">Kelola request deposit dan penarikan pengguna</p>
+  </div>
+  <div class="overflow-x-auto custom-scrollbar">
+    <table class="w-full text-left text-label-sm">
+      <thead class="bg-surface-container-low text-on-surface-variant text-[10px] uppercase tracking-[0.08em]">
+        <tr>
+          <th class="px-4 py-3">User</th>
+          <th class="px-4 py-3">Amount</th>
+          <th class="px-4 py-3">Method</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Date</th>
+          <th class="px-4 py-3">Action</th>
+        </tr>
+      </thead>
+      <tbody id="adminDepositsTable" class="divide-y divide-white/5 font-data-tabular"></tbody>
+    </table>
+  </div>
 </div>
 </div>
 
-<div id="adminMonitoringSection" class="admin-section p-lg" style="display: none;">
-<h2 class="font-headline-lg mb-6">Market Monitoring</h2>
+<!-- Market Monitoring Section -->
+<div id="adminMonitoringSection" class="admin-section hidden p-lg">
+<h2 class="font-headline-lg text-headline-lg mb-6">Market Monitoring</h2>
 <div class="glass-card rounded-xl overflow-hidden mb-6">
-<div class="p-md border-b border-white/5 bg-surface-container-low"><h3 class="font-headline-md text-[18px]">Market Indices</h3><p class="text-label-sm text-on-surface-variant">Pantau indeks pasar secara real-time</p></div>
-<div class="overflow-x-auto custom-scrollbar"><table class="w-full text-label-sm"><thead class="text-on-surface-variant text-[10px] uppercase"><tr><th class="px-4 py-3">Index</th><th class="px-4 py-3">Value</th><th class="px-4 py-3">Change</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Action</th></tr></thead><tbody id="adminMonitoringTable" class="divide-y divide-white/5"></tbody></table></div>
+  <div class="p-md border-b border-white/5 bg-surface-container-low">
+    <h3 class="font-headline-md text-[18px]">Market Indices</h3>
+    <p class="text-label-sm text-on-surface-variant">Pantau indeks pasar secara real-time</p>
+  </div>
+  <div class="overflow-x-auto custom-scrollbar">
+    <table class="w-full text-left text-label-sm">
+      <thead class="bg-surface-container-low text-on-surface-variant text-[10px] uppercase tracking-[0.08em]">
+        <tr>
+          <th class="px-4 py-3">Index</th>
+          <th class="px-4 py-3">Value</th>
+          <th class="px-4 py-3">Change</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Action</th>
+        </tr>
+      </thead>
+      <tbody id="adminMonitoringTable" class="divide-y divide-white/5 font-data-tabular"></tbody>
+    </table>
+  </div>
 </div>
 <div class="glass-card rounded-xl overflow-hidden">
-<div class="p-md border-b border-white/5 bg-surface-container-low"><h3 class="font-headline-md text-[18px]">Stock Prices</h3><p class="text-label-sm text-on-surface-variant">Kelola harga saham</p></div>
-<div class="overflow-x-auto custom-scrollbar"><table class="w-full text-label-sm"><thead class="text-on-surface-variant text-[10px] uppercase"><tr><th class="px-4 py-3">Code</th><th class="px-4 py-3">Company</th><th class="px-4 py-3">Price</th><th class="px-4 py-3">Change</th><th class="px-4 py-3">Volume</th><th class="px-4 py-3">Action</th></tr></thead><tbody id="adminStocksMonitoringTable" class="divide-y divide-white/5"></tbody></table></div>
+  <div class="p-md border-b border-white/5 bg-surface-container-low">
+    <h3 class="font-headline-md text-[18px]">Stock Prices</h3>
+    <p class="text-label-sm text-on-surface-variant">Monitor dan kelola harga saham</p>
+  </div>
+  <div class="overflow-x-auto custom-scrollbar">
+    <table class="w-full text-left text-label-sm">
+      <thead class="bg-surface-container-low text-on-surface-variant text-[10px] uppercase tracking-[0.08em]">
+        <tr>
+          <th class="px-4 py-3">Code</th>
+          <th class="px-4 py-3">Company</th>
+          <th class="px-4 py-3">Price</th>
+          <th class="px-4 py-3">Change</th>
+          <th class="px-4 py-3">Volume</th>
+          <th class="px-4 py-3">Action</th>
+        </tr>
+      </thead>
+      <tbody id="adminStocksMonitoringTable" class="divide-y divide-white/5 font-data-tabular"></tbody>
+    </table>
+  </div>
 </div>
 </div>
 
-<div id="adminSettingsSection" class="admin-section p-lg" style="display: none;">
-<h2 class="font-headline-lg mb-6">Admin Settings</h2>
+<!-- Settings Section -->
+<div id="adminSettingsSection" class="admin-section hidden p-lg">
+<h2 class="font-headline-lg text-headline-lg mb-6">Admin Settings</h2>
 <div class="glass-card p-5 rounded-xl space-y-6">
-<div>
-<h3 class="font-bold mb-2">Pengaturan Platform</h3>
-<p class="text-label-sm text-on-surface-variant mb-4">Biaya transaksi: 0.15%</p>
-<button class="px-4 py-2 bg-primary/10 border border-primary/20 text-primary rounded-lg">Ubah Pengaturan</button>
-</div>
+  <div>
+    <h3 class="font-bold mb-2">Pengaturan Platform</h3>
+    <p class="text-label-sm text-on-surface-variant mb-4">Biaya transaksi: 0.15%</p>
+    <button class="px-4 py-2 bg-primary/10 border border-primary/20 text-primary rounded-lg font-label-sm hover:bg-primary/20 transition-all">Ubah Pengaturan</button>
+  </div>
 </div>
 </div>
 </main>

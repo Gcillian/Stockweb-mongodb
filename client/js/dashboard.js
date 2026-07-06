@@ -698,10 +698,21 @@ function setupAdminDashboardNavigation() {
   const adminMenuLinks = document.querySelectorAll('.admin-menu-link');
   const adminSections = document.querySelectorAll('.admin-section');
 
+  // Helper: hide a section (remove inline style + add hidden class)
+  const hideSection = (s) => {
+    s.classList.add('hidden');
+    s.style.display = '';
+  };
+  // Helper: show a section (remove hidden class + inline style)
+  const showSection = (s) => {
+    s.classList.remove('hidden');
+    s.style.display = '';
+  };
+
   // Initial state: only dashboard section visible
-  adminSections.forEach(s => s.classList.add('hidden'));
+  adminSections.forEach(hideSection);
   const initialSection = document.querySelector('#adminDashboardSection');
-  if (initialSection) initialSection.classList.remove('hidden');
+  if (initialSection) showSection(initialSection);
 
   // Expose global click handler (called via inline onclick in HTML)
   window.__nusatradeAdminMenuClick = (link, menu) => {
@@ -709,7 +720,7 @@ function setupAdminDashboardNavigation() {
     const adminSectionsLocal = document.querySelectorAll('.admin-section');
 
     // Hide all admin sections
-    adminSectionsLocal.forEach(s => s.classList.add('hidden'));
+    adminSectionsLocal.forEach(hideSection);
 
     // Remove active state from all menu links
     adminMenuLinksLocal.forEach(m => {
@@ -721,7 +732,7 @@ function setupAdminDashboardNavigation() {
     const targetSectionId = 'admin' + menu.charAt(0).toUpperCase() + menu.slice(1) + 'Section';
     const targetSection = document.getElementById(targetSectionId);
     if (targetSection) {
-      targetSection.classList.remove('hidden');
+      showSection(targetSection);
     } else {
       console.warn('Admin section not found:', targetSectionId);
     }
@@ -767,58 +778,83 @@ function setupAdminDashboardNavigation() {
 }
 
 // Render admin users table
-function renderAdminUsersTable() {
+function renderAdminUsersTable(filter = '') {
   const tbody = document.querySelector('#adminUsersTable');
+  const countEl = document.querySelector('#adminUsersCount');
   if (!tbody) return;
   tbody.innerHTML = '';
-  
-  // Render from global variable
-  adminUsers.forEach(user => {
+
+  const filtered = filter
+    ? adminUsers.filter(u => u.name?.toLowerCase().includes(filter) || u.email?.toLowerCase().includes(filter))
+    : adminUsers;
+
+  if (countEl) countEl.textContent = `${filtered.length} pengguna`;
+
+  filtered.forEach(user => {
     const row = document.createElement('tr');
+    row.className = 'hover:bg-white/5 transition-colors';
     row.innerHTML = `
-      <td class="px-4 py-3 text-label-sm">${user.name}</td>
-      <td class="px-4 py-3 text-label-sm">${user.email}</td>
-      <td class="px-4 py-3 text-label-sm font-bold">Rp ${(user.balance || 0).toLocaleString('id-ID')}</td>
       <td class="px-4 py-3 text-label-sm">
-        <span class="px-2 py-1 rounded text-[10px] font-bold ${user.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-surface-variant'}">${user.role}</span>
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px]">
+            ${(user.name || 'U')[0].toUpperCase()}
+          </div>
+          ${user.name}
+        </div>
+      </td>
+      <td class="px-4 py-3 text-label-sm text-on-surface-variant">${user.email}</td>
+      <td class="px-4 py-3 text-label-sm font-bold font-data-tabular">Rp ${(user.balance || 0).toLocaleString('id-ID')}</td>
+      <td class="px-4 py-3 text-label-sm">
+        <span class="px-2 py-1 rounded-full text-[10px] font-bold ${user.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-surface-variant text-on-surface-variant'}">${user.role}</span>
       </td>
       <td class="px-4 py-3 text-label-sm">
-        <button class="text-primary hover:underline text-[12px]" onclick="editUser('${user._id}')">Edit</button>
-        <button class="text-secondary ml-2 hover:underline text-[12px]" onclick="deleteUser('${user._id}')">Delete</button>
+        <button class="text-primary hover:underline text-[12px] mr-3" onclick="editUser('${user._id}')">Edit</button>
+        <button class="text-error hover:underline text-[12px]" onclick="deleteUser('${user._id}')">Hapus</button>
       </td>
     `;
     tbody.appendChild(row);
   });
-  
-  if (adminUsers.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-3 text-label-sm text-on-surface-variant text-center">Tidak ada data pengguna</td></tr>';
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-label-sm text-on-surface-variant text-center">Tidak ada data pengguna</td></tr>';
+  }
+
+  // Bind search input once
+  const searchEl = document.querySelector('#usersSearchInput');
+  if (searchEl && !searchEl.dataset.bound) {
+    searchEl.addEventListener('input', () => renderAdminUsersTable(searchEl.value.trim().toLowerCase()));
+    searchEl.dataset.bound = 'true';
   }
 }
 
 // Render admin trading table  
 function renderAdminTradingTable() {
   const tbody = document.querySelector('#adminTradingTable');
+  const countEl = document.querySelector('#adminTradingCount');
   if (!tbody) return;
   tbody.innerHTML = '';
-  
-  // Render from global variable
+
+  if (countEl) countEl.textContent = `${adminTransactions.length} transaksi`;
+
   adminTransactions.forEach(tx => {
     const row = document.createElement('tr');
+    row.className = 'hover:bg-white/5 transition-colors';
+    const isBuy = tx.type === 'buy';
     row.innerHTML = `
-      <td class="px-4 py-3 text-label-sm">${tx.userId || 'Unknown'}</td>
-      <td class="px-4 py-3 text-label-sm font-bold">${tx.stockCode}</td>
+      <td class="px-4 py-3 text-label-sm text-on-surface-variant">${tx.userId || '—'}</td>
+      <td class="px-4 py-3 text-label-sm font-bold font-data-tabular">${tx.stockCode}</td>
       <td class="px-4 py-3 text-label-sm">
-        <span class="px-2 py-1 rounded text-[10px] font-bold ${tx.type === 'buy' ? 'bg-primary/20 text-primary' : 'bg-secondary-container/20 text-secondary'}">${tx.type?.toUpperCase() || 'BUY'}</span>
+        <span class="px-2 py-1 rounded-full text-[10px] font-bold ${isBuy ? 'bg-primary/20 text-primary' : 'bg-error/20 text-error'}">${(tx.type || 'buy').toUpperCase()}</span>
       </td>
-      <td class="px-4 py-3 text-label-sm">${tx.quantity}</td>
-      <td class="px-4 py-3 text-label-sm">Rp ${(tx.total || 0).toLocaleString('id-ID')}</td>
-      <td class="px-4 py-3 text-label-sm text-on-surface-variant text-[10px]">${tx.createdAt ? new Date(tx.createdAt).toLocaleString() : '-'}</td>
+      <td class="px-4 py-3 text-label-sm font-data-tabular">${(tx.quantity || 0).toLocaleString('id-ID')}</td>
+      <td class="px-4 py-3 text-label-sm font-data-tabular font-bold">Rp ${(tx.total || 0).toLocaleString('id-ID')}</td>
+      <td class="px-4 py-3 text-label-sm text-on-surface-variant text-[10px]">${tx.createdAt ? new Date(tx.createdAt).toLocaleString('id-ID') : '—'}</td>
     `;
     tbody.appendChild(row);
   });
-  
+
   if (adminTransactions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-3 text-label-sm text-on-surface-variant text-center">Tidak ada data transaksi</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-label-sm text-on-surface-variant text-center">Tidak ada data transaksi</td></tr>';
   }
 }
 
@@ -827,25 +863,25 @@ function renderAdminStocksTable() {
   const tbody = document.querySelector('#adminStocksTable');
   if (!tbody) return;
   tbody.innerHTML = '';
-  
-  // Render from global variable
+
   adminStocks.forEach(stock => {
     const row = document.createElement('tr');
+    row.className = 'hover:bg-white/5 transition-colors';
     row.innerHTML = `
-      <td class="px-4 py-3 text-label-sm font-bold">${stock.stockCode}</td>
+      <td class="px-4 py-3 text-label-sm font-bold font-data-tabular text-primary">${stock.stockCode}</td>
       <td class="px-4 py-3 text-label-sm">${stock.companyName}</td>
-      <td class="px-4 py-3 text-label-sm">Rp ${(stock.price || 0).toLocaleString('id-ID')}</td>
-      <td class="px-4 py-3 text-label-sm">${(stock.volume || 0).toLocaleString('id-ID')}</td>
+      <td class="px-4 py-3 text-label-sm font-data-tabular font-bold">Rp ${(stock.price || 0).toLocaleString('id-ID')}</td>
+      <td class="px-4 py-3 text-label-sm font-data-tabular text-on-surface-variant">${(stock.volume || 0).toLocaleString('id-ID')}</td>
       <td class="px-4 py-3 text-label-sm">
-        <button class="text-primary hover:underline text-[12px]" onclick="editStock('${stock._id}')">Edit</button>
-        <button class="text-secondary ml-2 hover:underline text-[12px]" onclick="deleteStock('${stock._id}')">Delete</button>
+        <button class="text-primary hover:underline text-[12px] mr-3" onclick="editStock('${stock._id}')">Edit</button>
+        <button class="text-error hover:underline text-[12px]" onclick="deleteStock('${stock._id}')">Hapus</button>
       </td>
     `;
     tbody.appendChild(row);
   });
-  
+
   if (adminStocks.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-3 text-label-sm text-on-surface-variant text-center">Tidak ada data saham</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-label-sm text-on-surface-variant text-center">Tidak ada data saham</td></tr>';
   }
 }
 
