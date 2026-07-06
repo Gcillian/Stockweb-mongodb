@@ -262,49 +262,48 @@
 <div class="glass-card p-md rounded-xl">
 <p class="text-on-surface-variant font-label-sm">Total Users</p>
 <div class="flex items-baseline gap-xs mt-sm">
-<span class="font-headline-md text-headline-md font-bold">125.4k</span>
-<span class="text-primary text-xs">+12%</span>
+<span id="adminStatTotalUsers" class="font-headline-md text-headline-md font-bold">—</span>
+<span class="text-primary text-xs">terdaftar</span>
 </div>
 <div class="w-full h-1 bg-white/5 mt-md rounded-full overflow-hidden">
-<div class="h-full bg-primary w-[85%]"></div>
+<div id="adminBarUsers" class="h-full bg-primary w-[5%]"></div>
 </div>
 </div>
 <div class="glass-card p-md rounded-xl">
 <p class="text-on-surface-variant font-label-sm">Active Traders</p>
 <div class="flex items-baseline gap-xs mt-sm">
-<span class="font-headline-md text-headline-md font-bold text-primary">8.2k</span>
-<span class="text-on-surface-variant text-xs">Live</span>
+<span id="adminStatActiveTraders" class="font-headline-md text-headline-md font-bold text-primary">—</span>
+<span class="text-on-surface-variant text-xs">hari ini</span>
 </div>
 <div class="w-full h-1 bg-white/5 mt-md rounded-full overflow-hidden">
-<div class="h-full bg-primary w-[40%]"></div>
+<div id="adminBarTraders" class="h-full bg-primary w-[5%]"></div>
 </div>
 </div>
 <div class="glass-card p-md rounded-xl">
 <p class="text-on-surface-variant font-label-sm">Total Transactions</p>
 <div class="flex items-baseline gap-xs mt-sm">
-<span class="font-headline-md text-headline-md font-bold">45.2k</span>
-<span class="text-primary text-xs">+5.4k</span>
+<span id="adminStatTotalTx" class="font-headline-md text-headline-md font-bold">—</span>
 </div>
 <div class="w-full h-1 bg-white/5 mt-md rounded-full overflow-hidden">
-<div class="h-full bg-primary w-[65%]"></div>
+<div id="adminBarTx" class="h-full bg-primary w-[5%]"></div>
 </div>
 </div>
 <div class="glass-card p-md rounded-xl">
-<p class="text-on-surface-variant font-label-sm">Daily Volume</p>
+<p class="text-on-surface-variant font-label-sm">Total Volume</p>
 <div class="flex items-baseline gap-xs mt-sm">
-<span class="font-headline-md text-headline-md font-bold">Rp 850B</span>
+<span id="adminStatDailyVolume" class="font-headline-md text-headline-md font-bold">—</span>
 </div>
 <div class="w-full h-1 bg-white/5 mt-md rounded-full overflow-hidden">
-<div class="h-full bg-primary w-[92%]"></div>
+<div id="adminBarVolume" class="h-full bg-primary w-[5%]"></div>
 </div>
 </div>
 <div class="glass-card p-md rounded-xl border-primary/20">
 <p class="text-on-surface-variant font-label-sm">Platform Revenue</p>
 <div class="flex items-baseline gap-xs mt-sm">
-<span class="font-headline-md text-headline-md font-bold text-primary">Rp 1.2B</span>
+<span id="adminStatRevenue" class="font-headline-md text-headline-md font-bold text-primary">—</span>
 </div>
 <div class="w-full h-1 bg-white/5 mt-md rounded-full overflow-hidden">
-<div class="h-full bg-primary w-[78%] shadow-[0_0_8px_rgba(78,222,163,0.5)]"></div>
+<div id="adminBarRevenue" class="h-full bg-primary w-[5%] shadow-[0_0_8px_rgba(78,222,163,0.5)]"></div>
 </div>
 </div>
 </div>
@@ -352,31 +351,8 @@
 <h4 class="font-headline-md text-[18px]">Top Gainers</h4>
 <span class="material-symbols-outlined text-primary text-sm" data-icon="trending_up">trending_up</span>
 </div>
-<div class="space-y-md">
-<div class="flex items-center justify-between">
-<div>
-<p class="font-bold font-data-tabular">BBCA</p>
-<p class="text-[10px] text-on-surface-variant">Bank Central Asia</p>
-</div>
-<div class="text-right">
-<p class="text-primary font-bold">+2.45%</p>
-<div class="w-16 h-4 opacity-50">
-<svg class="w-full h-full" viewbox="0 0 100 20"><polyline fill="none" points="0,20 20,15 40,18 60,10 80,12 100,2" stroke="#4edea3" stroke-width="2"></polyline></svg>
-</div>
-</div>
-</div>
-<div class="flex items-center justify-between">
-<div>
-<p class="font-bold font-data-tabular">GOTO</p>
-<p class="text-[10px] text-on-surface-variant">GoTo Gojek Tokopedia</p>
-</div>
-<div class="text-right">
-<p class="text-primary font-bold">+1.82%</p>
-<div class="w-16 h-4 opacity-50">
-<svg class="w-full h-full" viewbox="0 0 100 20"><polyline fill="none" points="0,15 25,18 50,12 75,14 100,5" stroke="#4edea3" stroke-width="2"></polyline></svg>
-</div>
-</div>
-</div>
+<div id="adminGainersList" class="space-y-md">
+<p class="text-label-sm text-on-surface-variant animate-pulse">Memuat...</p>
 </div>
 </div>
 <div class="glass-card rounded-xl p-md">
@@ -384,31 +360,8 @@
 <h4 class="font-headline-md text-[18px]">Top Losers</h4>
 <span class="material-symbols-outlined text-error text-sm" data-icon="trending_down">trending_down</span>
 </div>
-<div class="space-y-md">
-<div class="flex items-center justify-between">
-<div>
-<p class="font-bold font-data-tabular">TLKM</p>
-<p class="text-[10px] text-on-surface-variant">Telkom Indonesia</p>
-</div>
-<div class="text-right">
-<p class="text-error font-bold">-3.12%</p>
-<div class="w-16 h-4 opacity-50">
-<svg class="w-full h-full" viewbox="0 0 100 20"><polyline fill="none" points="0,2 30,12 60,10 80,18 100,20" stroke="#ffb4ab" stroke-width="2"></polyline></svg>
-</div>
-</div>
-</div>
-<div class="flex items-center justify-between">
-<div>
-<p class="font-bold font-data-tabular">ADRO</p>
-<p class="text-[10px] text-on-surface-variant">Adaro Energy</p>
-</div>
-<div class="text-right">
-<p class="text-error font-bold">-2.05%</p>
-<div class="w-16 h-4 opacity-50">
-<svg class="w-full h-full" viewbox="0 0 100 20"><polyline fill="none" points="0,5 25,8 50,15 75,12 100,18" stroke="#ffb4ab" stroke-width="2"></polyline></svg>
-</div>
-</div>
-</div>
+<div id="adminLosersList" class="space-y-md">
+<p class="text-label-sm text-on-surface-variant animate-pulse">Memuat...</p>
 </div>
 </div>
 </div>
@@ -419,162 +372,64 @@
 <div class="xl:col-span-2 glass-card rounded-xl overflow-hidden">
 <div class="p-md border-b border-white/5 flex justify-between items-center">
 <h3 class="font-headline-md text-[20px]">Recent Trading Activity</h3>
-<button class="text-primary font-label-sm hover:underline">View All</button>
+<button class="text-primary font-label-sm hover:underline" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(null,'trading')">View All</button>
 </div>
 <div class="overflow-x-auto custom-scrollbar">
 <table class="w-full text-left font-label-sm">
 <thead class="bg-surface-container-low text-on-surface-variant/70 uppercase">
 <tr>
-<th class="px-md py-sm">User</th>
+<th class="px-md py-sm">User ID</th>
 <th class="px-md py-sm">Stock</th>
 <th class="px-md py-sm">Side</th>
-<th class="px-md py-sm">Price</th>
-<th class="px-md py-sm">Lot</th>
+<th class="px-md py-sm">Qty</th>
 <th class="px-md py-sm">Value</th>
-<th class="px-md py-sm">Status</th>
+<th class="px-md py-sm">Time</th>
 </tr>
 </thead>
-<tbody class="divide-y divide-white/5 font-data-tabular">
-<tr class="hover:bg-white/5 transition-colors">
-<td class="px-md py-md flex items-center gap-xs">
-<img alt="User Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrA3fKz_f562IZC3cCNbGcfpf34PI4R6LqrfE7Oa1Z0CoD96Lg4U2k1Y1bvUycOf8LMeYPbrV43gUbJbh2hZJgOEB0zapOxtdX1QJc2_LA-DiVJYlXWM6QkYKKJFiqRooj23ef7NpTinve549STrZg-4kkvElEzRgg08UyC_htXM6TW5yVxHg09LhMu1R-KhJgKq8qtEDCtnfrk1nvB1BMciPb0BuajudE0WdtjjEvyvZDDFDncWc6qiL8OEMVJErCBWxLw6gGB7lE"/>
-<span>Budi S.</span>
-</td>
-<td class="px-md py-md font-bold">BBRI</td>
-<td class="px-md py-md"><span class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/20">BUY</span></td>
-<td class="px-md py-md">5,250</td>
-<td class="px-md py-md">150</td>
-<td class="px-md py-md">Rp 78.7M</td>
-<td class="px-md py-md">
-<span class="flex items-center gap-1 text-primary">
-<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
-                                            Completed
-                                        </span>
-</td>
-</tr>
-<tr class="hover:bg-white/5 transition-colors">
-<td class="px-md py-md flex items-center gap-xs">
-<img alt="User Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBf3q2wPlgpzCa8Jbrm4dSG2wZKBKyCEJ9y9oNiVw5dLH3YYdmKFGRenZnRqDd9yaDi-D230AcKeS3GoGXMOlpJ0JpsOWXnXWLz4uBlfZmRnPrbqE6DFDG9znmtktZh6XplxptubbknMR8JyVC4xyjdyksB6viBmRVd1ECnoug6bx6sIxmX5qxw6ZE0h1k8IuYAIkNv9ylJFeV8FGFXBjTM3h5PS3elcCUTvFZki2msgvrS9nOCaaVTMiKl-tnWL5w4OVQJNEjtSnEQ"/>
-<span>Ani W.</span>
-</td>
-<td class="px-md py-md font-bold">ASII</td>
-<td class="px-md py-md"><span class="bg-error/20 text-error px-2 py-0.5 rounded border border-error/20">SELL</span></td>
-<td class="px-md py-md">6,125</td>
-<td class="px-md py-md">42</td>
-<td class="px-md py-md">Rp 25.7M</td>
-<td class="px-md py-md">
-<span class="flex items-center gap-1 text-on-surface-variant">
-<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span>
-                                            Pending
-                                        </span>
-</td>
-</tr>
-<tr class="hover:bg-white/5 transition-colors">
-<td class="px-md py-md flex items-center gap-xs">
-<img alt="User Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBR3rMITB4wZliGoi56M0H0Lna8gqiY7uCwAPMKqpNQAp_FA4pl26FWO_DBLv0dlZYQqXBEnsz4YzMEsqnt87f9hidiqpjrIIC2XYk-hR_-FXFJ-MDuVIGckgGtv4wpBUANrksqROYNTOSf66SD56OAcIeT42lC0uVWvekLxHLCqD_g6YbVEf5jpwcwkiRBkPaIR3OMmogUVhOawobj1kPFprsmVV72IpikPpNKzrMTpZVOBK9kY-Y_UcjbC8e3buxuTTHGc2LmWh_k"/>
-<span>Reza F.</span>
-</td>
-<td class="px-md py-md font-bold">BBNI</td>
-<td class="px-md py-md"><span class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/20">BUY</span></td>
-<td class="px-md py-md">5,400</td>
-<td class="px-md py-md">500</td>
-<td class="px-md py-md">Rp 270M</td>
-<td class="px-md py-md">
-<span class="flex items-center gap-1 text-primary">
-<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
-                                            Completed
-                                        </span>
-</td>
-</tr>
-<tr class="hover:bg-white/5 transition-colors">
-<td class="px-md py-md flex items-center gap-xs">
-<img alt="User Avatar" class="w-6 h-6 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAII6ht459EGjm4jxPthMK3CnYekV5utA7pIqwwu9Rq93zlb0hUAi8cORCK5vwmBWlqTrJ2Ic6_S-ki_x2bUaRiPXYjh2cD2Dser9JvPUb7znXAgh2QdljY7yCR19gTJtNoNteRPKV_KSmoH_d19ZFUHHN6IDTWzBmTVh0W1EUZ19lY_xzxfc4wqjP6gkhCQEZeS4eKoYZLt0MEpqKK_sxTA1WTYu83LC_Iv_4InO0baYqorDhr688cC_85ko_VWOCt2HOQlEHv77lK"/>
-<span>Citra D.</span>
-</td>
-<td class="px-md py-md font-bold">UNVR</td>
-<td class="px-md py-md"><span class="bg-error/20 text-error px-2 py-0.5 rounded border border-error/20">SELL</span></td>
-<td class="px-md py-md">3,850</td>
-<td class="px-md py-md">10</td>
-<td class="px-md py-md">Rp 3.8M</td>
-<td class="px-md py-md">
-<span class="flex items-center gap-1 text-primary">
-<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
-                                            Completed
-                                        </span>
-</td>
-</tr>
+<tbody id="adminRecentTradingTable" class="divide-y divide-white/5 font-data-tabular">
+<tr><td colspan="6" class="px-md py-6 text-label-sm text-on-surface-variant text-center animate-pulse">Memuat data...</td></tr>
 </tbody>
 </table>
 </div>
 </div>
-<!-- Right Column: KYC & Finance -->
+<!-- Right Column: Summary -->
 <div class="space-y-lg">
-<!-- User Management & KYC -->
+<!-- Recent Users -->
+<div class="glass-card rounded-xl overflow-hidden">
+<div class="p-md border-b border-white/5 bg-surface-container-low flex justify-between items-center">
+<h3 class="font-headline-md text-[18px]">Pengguna Terbaru</h3>
+<button class="text-primary font-label-sm hover:underline text-[11px]" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(null,'users')">Lihat Semua</button>
+</div>
+<div id="adminRecentUsersList" class="p-md space-y-md">
+<p class="text-label-sm text-on-surface-variant animate-pulse">Memuat...</p>
+</div>
+</div>
+<!-- Finance Summary -->
 <div class="glass-card rounded-xl overflow-hidden">
 <div class="p-md border-b border-white/5 bg-surface-container-low">
-<h3 class="font-headline-md text-[18px]">KYC Verifications</h3>
-</div>
-<div class="p-md space-y-md">
-<div class="flex items-center justify-between group">
-<div class="flex items-center gap-sm">
-<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
-<span class="material-symbols-outlined text-on-surface-variant" data-icon="person">person</span>
-</div>
-<div>
-<p class="font-bold text-sm">Pratama Putra</p>
-<p class="text-[10px] text-on-surface-variant">ID: #88291</p>
-</div>
-</div>
-<div class="flex gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-<button class="w-8 h-8 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center">
-<span class="material-symbols-outlined text-[18px]" data-icon="check">check</span>
-</button>
-<button class="w-8 h-8 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-on-surface flex items-center justify-center">
-<span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
-</button>
-</div>
-</div>
-<div class="flex items-center justify-between group">
-<div class="flex items-center gap-sm">
-<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
-<span class="material-symbols-outlined text-on-surface-variant" data-icon="person">person</span>
-</div>
-<div>
-<p class="font-bold text-sm">Dewi Lestari</p>
-<p class="text-[10px] text-on-surface-variant">ID: #88295</p>
-</div>
-</div>
-<div class="flex gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-<button class="w-8 h-8 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 flex items-center justify-center">
-<span class="material-symbols-outlined text-[18px]" data-icon="check">check</span>
-</button>
-<button class="w-8 h-8 rounded-lg bg-surface-container-highest text-on-surface-variant hover:text-on-surface flex items-center justify-center">
-<span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
-</button>
-</div>
-</div>
-<button class="w-full py-sm border border-white/5 rounded-lg text-xs font-label-sm hover:bg-white/5 transition-all">Review All Submissions (12)</button>
-</div>
-</div>
-<!-- Deposit & Withdrawal Monitoring -->
-<div class="glass-card rounded-xl overflow-hidden">
-<div class="p-md border-b border-white/5 bg-surface-container-low">
-<h3 class="font-headline-md text-[18px]">Financial Operations</h3>
+<h3 class="font-headline-md text-[18px]">Ringkasan Keuangan</h3>
 </div>
 <div class="p-md space-y-md">
 <div class="flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest">
 <div class="flex items-center gap-xs">
-<span class="material-symbols-outlined text-primary text-[20px]" data-icon="account_balance">account_balance</span>
-<span class="font-label-sm">Pending Deposits</span>
+<span class="material-symbols-outlined text-primary text-[20px]">trending_up</span>
+<span class="font-label-sm">Total Buy Volume</span>
 </div>
-<span class="font-bold text-primary font-data-tabular">Rp 2.4B</span>
+<span id="adminSumBuyVol" class="font-bold text-primary font-data-tabular">—</span>
 </div>
 <div class="flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest">
 <div class="flex items-center gap-xs">
-<span class="material-symbols-outlined text-error text-[20px]" data-icon="outbox">outbox</span>
-<span class="font-label-sm">Pending Withdrawals</span>
+<span class="material-symbols-outlined text-error text-[20px]">trending_down</span>
+<span class="font-label-sm">Total Sell Volume</span>
 </div>
-<span class="font-bold text-error font-data-tabular">Rp 842M</span>
+<span id="adminSumSellVol" class="font-bold text-error font-data-tabular">—</span>
+</div>
+<div class="flex items-center justify-between p-sm rounded-lg bg-surface-container-lowest">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">analytics</span>
+<span class="font-label-sm">Jumlah Saham Listing</span>
+</div>
+<span id="adminSumStocks" class="font-bold font-data-tabular">—</span>
 </div>
 </div>
 </div>
@@ -596,11 +451,13 @@
 <th class="px-4 py-3">Kode</th>
 <th class="px-4 py-3">Nama</th>
 <th class="px-4 py-3">Harga</th>
-<th class="px-4 py-3">Volume</th>
+<th class="px-4 py-3">% Change</th>
 <th class="px-4 py-3">Aksi</th>
 </tr>
 </thead>
-<tbody data-table="stocks" class="divide-y divide-white/5 font-data-tabular"></tbody>
+<tbody data-table="stocks" id="adminDashStocksTable" class="divide-y divide-white/5 font-data-tabular">
+<tr><td colspan="5" class="px-4 py-4 text-label-sm text-on-surface-variant text-center animate-pulse">Memuat...</td></tr>
+</tbody>
 </table>
 </div>
 </div>
@@ -622,7 +479,9 @@
 <th class="px-4 py-3">Aksi</th>
 </tr>
 </thead>
-<tbody data-table="users" class="divide-y divide-white/5 font-data-tabular"></tbody>
+<tbody data-table="users" id="adminDashUsersTable" class="divide-y divide-white/5 font-data-tabular">
+<tr><td colspan="5" class="px-4 py-4 text-label-sm text-on-surface-variant text-center animate-pulse">Memuat...</td></tr>
+</tbody>
 </table>
 </div>
 </div>

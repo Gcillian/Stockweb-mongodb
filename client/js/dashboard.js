@@ -120,14 +120,15 @@ async function loadHomePageStocks() {
       if (Array.isArray(stocks) && stocks.length > 0) {
         marketGrid.innerHTML = '';
         stocks.slice(0, 6).forEach(s => {
+          const change = s.changePercent ?? 0;
+          const changeColor = change >= 0 ? 'text-primary' : 'text-secondary';
+          const changeStr = change >= 0 ? `+${change}%` : `${change}%`;
           const card = document.createElement('div');
           card.className = 'glass-card p-md rounded-xl hover:border-primary/40 transition-all cursor-pointer';
-          const change = (Math.random() * 4 - 2).toFixed(2);
-          const changeColor = change > 0 ? 'text-primary' : 'text-secondary';
           card.innerHTML = `
             <div class="flex justify-between mb-xs">
               <span class="font-bold">${s.stockCode}</span>
-              <span class="${changeColor} text-label-sm">${change > 0 ? '+' : ''}${change}%</span>
+              <span class="${changeColor} text-label-sm">${changeStr}</span>
             </div>
             <p class="text-label-sm text-on-surface-variant mb-md truncate">${s.companyName || 'N/A'}</p>
             <p class="font-data-tabular text-headline-md">Rp ${(s.price || 0).toLocaleString('id-ID')}</p>
@@ -265,16 +266,17 @@ function renderMarketsView() {
   if (!grid) return;
   grid.innerHTML = '';
   stocks.forEach(stock => {
-    const change = (Math.random() * 4 - 2).toFixed(2);
-    const changeColor = change > 0 ? 'text-primary' : 'text-secondary';
+    const change = stock.changePercent ?? 0;
+    const changeColor = change >= 0 ? 'text-primary' : 'text-secondary';
+    const changeStr = change >= 0 ? `+${change}%` : `${change}%`;
     const card = document.createElement('div');
     card.className = 'glass-card p-5 rounded-xl cursor-pointer hover:border-primary/40 transition-all';
     card.innerHTML = `
       <div class="flex justify-between mb-3">
         <span class="font-bold text-headline-md">${stock.stockCode}</span>
-        <span class="${changeColor} text-label-sm font-bold">${change > 0 ? '+' : ''}${change}%</span>
+        <span class="${changeColor} text-label-sm font-bold">${changeStr}</span>
       </div>
-      <p class="text-label-sm text-on-surface-variant mb-3">${stock.companyName}</p>
+      <p class="text-label-sm text-on-surface-variant mb-3 truncate">${stock.companyName}</p>
       <p class="font-data-tabular text-body-md mb-4">${formatCurrency(stock.price)}</p>
       <button class="w-full bg-primary text-on-primary py-2 rounded-lg text-label-sm font-bold hover:opacity-90 transition-all" onclick="selectStockForBuy('${stock.stockCode}')">Pilih Saham</button>
     `;
@@ -556,16 +558,174 @@ function loadTransactionHistory(history) {
 // Load admin dashboard
 async function loadAdminDashboard() {
   try {
-    const users = await API.users();
+    // Muat data paralel untuk kecepatan
+    const [users, stockList, transactions, stats] = await Promise.all([
+      API.users(),
+      API.stocks(),
+      API.transactions(),
+      API.stats()
+    ]);
+
     adminUsers = users || [];
-    loadUsersTable(adminUsers);
-    adminStocks = await API.stocks();
-    loadStocksTable(adminStocks);
-    const transactions = await API.transactions();
+    adminStocks = stockList || [];
     adminTransactions = transactions || [];
+
+    // Populate stat cards dari data nyata
+    populateAdminStats(stats, adminUsers, adminStocks, adminTransactions);
+
+    // Populate tabel kecil di dashboard section
+    loadUsersTable(adminUsers);
+    loadStocksTable(adminStocks);
     loadTransactionsTable(adminTransactions);
+
+    // Populate gainers & losers
+    populateGainersLosers(stats);
+
   } catch (err) {
     console.error('Error loading admin dashboard:', err);
+  }
+}
+
+function populateAdminStats(stats, users, stocks, transactions) {
+  const fmt = (n) => {
+    if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + 'jt';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'k';
+    return n?.toLocaleString('id-ID') || '0';
+  };
+
+  // Gunakan stats dari server jika tersedia, fallback ke array lokal
+  const totalUsers  = stats?.totalUsers  ?? users.length;
+  const totalTx     = stats?.totalTransactions ?? transactions.length;
+  const totalVol    = stats?.totalVolume  ?? 0;
+  const revenue     = stats?.platformRevenue ?? 0;
+  const totalStocks = stats?.totalStocks  ?? stocks.length;
+
+  // Hitung active traders = users yang punya transaksi hari ini
+  const todayStr = new Date().toDateString();
+  const activeToday = new Set(
+    transactions
+      .filter(t => new Date(t.createdAt).toDateString() === todayStr)
+      .map(t => String(t.userId))
+  ).size;
+
+  const setEl = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+
+  setEl('adminStatTotalUsers',   fmt(totalUsers));
+  setEl('adminStatActiveTraders', fmt(activeToday));
+  setEl('adminStatTotalTx',      fmt(totalTx));
+  setEl('adminStatDailyVolume',  'Rp ' + fmt(totalVol));
+  setEl('adminStatRevenue',      'Rp ' + fmt(revenue));
+  setEl('adminStatTotalStocks',  fmt(totalStocks));
+
+  // Update progress bar widths secara proporsional
+  const setBar = (id, pct) => {
+    const el = document.getElementById(id);
+    if (el) el.style.width = Math.min(100, Math.max(2, pct)) + '%';
+  };
+  setBar('adminBarUsers',   Math.min(99, (totalUsers / 200) * 100));
+  setBar('adminBarTraders', Math.min(99, (activeToday / Math.max(totalUsers, 1)) * 100));
+  setBar('adminBarTx',      Math.min(99, (totalTx / 1000) * 100));
+  setBar('adminBarVolume',  Math.min(99, (totalVol / 1e10) * 100));
+  setBar('adminBarRevenue', Math.min(99, (revenue / 1e8)  * 100));
+
+  // Finance summary cards
+  const buyVol = transactions.filter(t => t.type === 'buy').reduce((s, t) => s + (t.total || 0), 0);
+  const sellVol = transactions.filter(t => t.type === 'sell').reduce((s, t) => s + (t.total || 0), 0);
+  setEl('adminSumBuyVol',   'Rp ' + fmt(buyVol));
+  setEl('adminSumSellVol',  'Rp ' + fmt(sellVol));
+  setEl('adminSumStocks',   String(totalStocks));
+
+  // Recent trading table (5 latest)
+  const recentTbody = document.getElementById('adminRecentTradingTable');
+  if (recentTbody) {
+    const recent = transactions.slice(0, 8);
+    if (recent.length === 0) {
+      recentTbody.innerHTML = '<tr><td colspan="6" class="px-md py-6 text-label-sm text-on-surface-variant text-center">Belum ada transaksi</td></tr>';
+    } else {
+      recentTbody.innerHTML = recent.map(tx => {
+        const isBuy = tx.type === 'buy';
+        return `<tr class="hover:bg-white/5 transition-colors">
+          <td class="px-md py-sm text-[11px] text-on-surface-variant">${String(tx.userId).slice(-8)}</td>
+          <td class="px-md py-sm font-bold">${tx.stockCode}</td>
+          <td class="px-md py-sm">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isBuy ? 'bg-primary/20 text-primary' : 'bg-error/20 text-error'}">${tx.type.toUpperCase()}</span>
+          </td>
+          <td class="px-md py-sm">${(tx.quantity||0).toLocaleString('id-ID')}</td>
+          <td class="px-md py-sm">Rp ${(tx.total||0).toLocaleString('id-ID')}</td>
+          <td class="px-md py-sm text-[10px] text-on-surface-variant">${tx.createdAt ? new Date(tx.createdAt).toLocaleString('id-ID') : '—'}</td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  // Recent users list (5 newest)
+  const recentUsersEl = document.getElementById('adminRecentUsersList');
+  if (recentUsersEl) {
+    const recentUsers = [...users].slice(-5).reverse();
+    if (recentUsers.length === 0) {
+      recentUsersEl.innerHTML = '<p class="text-label-sm text-on-surface-variant">Belum ada pengguna</p>';
+    } else {
+      recentUsersEl.innerHTML = recentUsers.map(u => `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-sm">
+            <div class="w-9 h-9 rounded-lg bg-surface-container-highest flex items-center justify-center">
+              <span class="font-bold text-primary text-[12px]">${(u.name||'U')[0].toUpperCase()}</span>
+            </div>
+            <div>
+              <p class="font-bold text-sm">${u.name}</p>
+              <p class="text-[10px] text-on-surface-variant">${u.email}</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${u.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-surface-variant text-on-surface-variant'}">${u.role}</span>
+        </div>`).join('');
+    }
+  }
+}
+
+function populateGainersLosers(stats) {
+  // Gainers
+  const gainersEl = document.getElementById('adminGainersList');
+  if (gainersEl) {
+    const gainers = stats?.gainers || [];
+    if (gainers.length === 0) {
+      gainersEl.innerHTML = '<p class="text-label-sm text-on-surface-variant">Belum ada data pergerakan harga</p>';
+    } else {
+      gainersEl.innerHTML = gainers.map(s => `
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="font-bold font-data-tabular">${s.stockCode}</p>
+            <p class="text-[10px] text-on-surface-variant">${s.companyName || ''}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-primary font-bold">+${s.change}%</p>
+            <p class="text-[10px] text-on-surface-variant font-data-tabular">Rp ${(s.price||0).toLocaleString('id-ID')}</p>
+          </div>
+        </div>`).join('');
+    }
+  }
+  // Losers
+  const losersEl = document.getElementById('adminLosersList');
+  if (losersEl) {
+    const losers = stats?.losers || [];
+    if (losers.length === 0) {
+      losersEl.innerHTML = '<p class="text-label-sm text-on-surface-variant">Belum ada data pergerakan harga</p>';
+    } else {
+      losersEl.innerHTML = losers.map(s => `
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="font-bold font-data-tabular">${s.stockCode}</p>
+            <p class="text-[10px] text-on-surface-variant">${s.companyName || ''}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-error font-bold">${s.change}%</p>
+            <p class="text-[10px] text-on-surface-variant font-data-tabular">Rp ${(s.price||0).toLocaleString('id-ID')}</p>
+          </div>
+        </div>`).join('');
+    }
   }
 }
 
@@ -611,86 +771,84 @@ window.createStock = async () => {
   }
 }
 
-// Load users table
+// Load users table — isi tabel di dashboard section
 function loadUsersTable(users) {
-  const container = document.querySelector('[data-table="users"]') ||
-                   createTableContainer('Users');
-  
-  if (!container) return;
-  
-  const tbody = container.querySelector('tbody') || container;
-  tbody.innerHTML = '';
-  
-  (users || []).forEach(user => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td class="px-4 py-3 text-label-sm">${user.name}</td>
-      <td class="px-4 py-3 text-label-sm">${user.email}</td>
-      <td class="px-4 py-3 text-label-sm font-bold">Rp ${user.balance.toLocaleString('id-ID')}</td>
-      <td class="px-4 py-3 text-label-sm">
-        <span class="px-2 py-1 rounded text-[10px] font-bold ${user.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-surface-variant'}">${user.role}</span>
-      </td>
-      <td class="px-4 py-3 text-label-sm">
-        <button class="text-primary hover:underline text-[12px]" onclick="editUser('${user._id}')">Edit</button>
-        <button class="text-secondary ml-2 hover:underline text-[12px]" onclick="deleteUser('${user._id}')">Delete</button>
-      </td>
-    `;
-    tbody.appendChild(row);
+  const tbodies = [
+    document.querySelector('#adminDashUsersTable'),
+    document.querySelector('[data-table="users"]')
+  ].filter(Boolean);
+
+  tbodies.forEach(tbody => {
+    tbody.innerHTML = '';
+    const list = users.slice(0, 8);
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-label-sm text-on-surface-variant text-center">Tidak ada pengguna</td></tr>';
+      return;
+    }
+    list.forEach(user => {
+      const row = document.createElement('tr');
+      row.className = 'hover:bg-white/5 transition-colors';
+      row.innerHTML = `
+        <td class="px-4 py-3 text-label-sm">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[9px]">${(user.name||'U')[0].toUpperCase()}</div>
+            ${user.name}
+          </div>
+        </td>
+        <td class="px-4 py-3 text-label-sm text-on-surface-variant">${user.email}</td>
+        <td class="px-4 py-3 text-label-sm font-bold font-data-tabular">Rp ${(user.balance||0).toLocaleString('id-ID')}</td>
+        <td class="px-4 py-3 text-label-sm">
+          <span class="px-2 py-1 rounded-full text-[10px] font-bold ${user.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-surface-variant text-on-surface-variant'}">${user.role}</span>
+        </td>
+        <td class="px-4 py-3 text-label-sm">
+          <button class="text-primary hover:underline text-[12px] mr-2" onclick="editUser('${user._id}')">Edit</button>
+          <button class="text-error hover:underline text-[12px]" onclick="deleteUser('${user._id}')">Hapus</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
   });
 }
 
-// Load stocks table
+// Load stocks table — isi tabel di dashboard section
 function loadStocksTable(stocks) {
-  const container = document.querySelector('[data-table="stocks"]') ||
-                   createTableContainer('Stocks');
-  
-  if (!container) return;
-  
-  const tbody = container.querySelector('tbody') || container;
-  tbody.innerHTML = '';
-  
-  (stocks || []).forEach(stock => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td class="px-4 py-3 text-label-sm font-bold">${stock.stockCode}</td>
-      <td class="px-4 py-3 text-label-sm">${stock.companyName}</td>
-      <td class="px-4 py-3 text-label-sm">Rp ${stock.price.toLocaleString('id-ID')}</td>
-      <td class="px-4 py-3 text-label-sm">${stock.volume.toLocaleString('id-ID')}</td>
-      <td class="px-4 py-3 text-label-sm">
-        <button class="text-primary hover:underline text-[12px]" onclick="editStock('${stock._id}')">Edit</button>
-        <button class="text-secondary ml-2 hover:underline text-[12px]" onclick="deleteStock('${stock._id}')">Delete</button>
-      </td>
-    `;
-    tbody.appendChild(row);
+  const tbodies = [
+    document.querySelector('#adminDashStocksTable'),
+    document.querySelector('[data-table="stocks"]')
+  ].filter(Boolean);
+
+  tbodies.forEach(tbody => {
+    tbody.innerHTML = '';
+    const list = stocks.slice(0, 8);
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-4 text-label-sm text-on-surface-variant text-center">Tidak ada saham</td></tr>';
+      return;
+    }
+    list.forEach(stock => {
+      const change = stock.changePercent ?? 0;
+      const changeColor = change > 0 ? 'text-primary' : change < 0 ? 'text-error' : 'text-on-surface-variant';
+      const changeStr = change > 0 ? `+${change}%` : `${change}%`;
+      const row = document.createElement('tr');
+      row.className = 'hover:bg-white/5 transition-colors';
+      row.innerHTML = `
+        <td class="px-4 py-3 text-label-sm font-bold font-data-tabular text-primary">${stock.stockCode}</td>
+        <td class="px-4 py-3 text-label-sm truncate max-w-[140px]">${stock.companyName || '—'}</td>
+        <td class="px-4 py-3 text-label-sm font-data-tabular font-bold">Rp ${(stock.price||0).toLocaleString('id-ID')}</td>
+        <td class="px-4 py-3 text-label-sm font-bold font-data-tabular ${changeColor}">${changeStr}</td>
+        <td class="px-4 py-3 text-label-sm">
+          <button class="text-primary hover:underline text-[12px] mr-2" onclick="editStock('${stock._id}')">Edit</button>
+          <button class="text-error hover:underline text-[12px]" onclick="deleteStock('${stock._id}')">Hapus</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
   });
 }
 
-// Load transactions table
+// Load transactions table — data sudah di adminTransactions
 function loadTransactionsTable(transactions) {
-  const container = document.querySelector('[data-table="transactions"]') ||
-                   createTableContainer('Transactions');
-  
-  if (!container) return;
-  
-  const tbody = container.querySelector('tbody') || container;
-  tbody.innerHTML = '';
-  
-  (transactions || []).forEach(tx => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td class="px-4 py-3 text-label-sm">${tx.userId}</td>
-      <td class="px-4 py-3 text-label-sm font-bold">${tx.stockCode}</td>
-      <td class="px-4 py-3 text-label-sm">
-        <span class="px-2 py-1 rounded text-[10px] font-bold ${tx.type === 'buy' ? 'bg-primary/20 text-primary' : 'bg-secondary-container/20 text-secondary'}">
-          ${tx.type.toUpperCase()}
-        </span>
-      </td>
-      <td class="px-4 py-3 text-label-sm">${tx.quantity}</td>
-      <td class="px-4 py-3 text-label-sm">Rp ${tx.total.toLocaleString('id-ID')}</td>
-      <td class="px-4 py-3 text-label-sm text-on-surface-variant text-[10px]">${new Date(tx.createdAt).toLocaleString()}</td>
-    `;
-    tbody.appendChild(row);
-  });
+  // Dashboard section menampilkan via adminRecentTradingTable (diisi oleh populateAdminStats)
+  // Full table di adminTradingSection dirender oleh renderAdminTradingTable
 }
 
 // Setup admin dashboard navigation
@@ -1005,78 +1163,78 @@ window.deleteStock = async (stockId) => {
   }
 };
 
-// Render admin deposits table
+// Render admin deposits table — data dari transaksi (beli = deposit aksi, jual = withdrawal aksi)
 function renderAdminDepositsTable() {
   const tbody = document.querySelector('#adminDepositsTable');
   if (!tbody) return;
   tbody.innerHTML = '';
-  
-  const deposits = [
-    { user: 'Ahmad Wijaya', amount: 50000000, method: 'Bank Transfer', status: 'Completed', date: '2026-06-01 10:30' },
-    { user: 'Siti Nurhaliza', amount: 25000000, method: 'E-Wallet', status: 'Pending', date: '2026-06-01 09:15' },
-    { user: 'Budi Santoso', amount: 100000000, method: 'Bank Transfer', status: 'Completed', date: '2026-05-31 16:45' },
-    { user: 'Dewi Lestari', amount: 15000000, method: 'E-Wallet', status: 'Completed', date: '2026-05-31 14:20' },
-    { user: 'Rizky Pratama', amount: 75000000, method: 'Bank Transfer', status: 'Rejected', date: '2026-05-30 11:00' }
-  ];
-  
-  deposits.forEach(deposit => {
+
+  // Ambil transaksi terbaru sebagai proxy deposit/withdrawal activity
+  // (jika ada Deposit model terpisah di masa depan, ganti di sini)
+  const recent = adminTransactions.slice(0, 30);
+
+  if (recent.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-label-sm text-on-surface-variant text-center">Tidak ada data transaksi</td></tr>';
+    return;
+  }
+
+  recent.forEach(tx => {
+    const isBuy = tx.type === 'buy';
     const row = document.createElement('tr');
-    const statusClass = deposit.status === 'Completed' ? 'bg-primary/20 text-primary' : 
-                        deposit.status === 'Pending' ? 'bg-tertiary/20 text-tertiary' : 
-                        'bg-error/20 text-error';
+    row.className = 'hover:bg-white/5 transition-colors';
     row.innerHTML = `
-      <td class="px-4 py-3 text-label-sm">${deposit.user}</td>
-      <td class="px-4 py-3 text-label-sm font-bold">Rp ${deposit.amount.toLocaleString('id-ID')}</td>
-      <td class="px-4 py-3 text-label-sm">${deposit.method}</td>
+      <td class="px-4 py-3 text-label-sm text-on-surface-variant">${tx.userId || '—'}</td>
+      <td class="px-4 py-3 text-label-sm font-bold font-data-tabular">Rp ${(tx.total||0).toLocaleString('id-ID')}</td>
+      <td class="px-4 py-3 text-label-sm">${tx.stockCode}</td>
       <td class="px-4 py-3 text-label-sm">
-        <span class="px-2 py-1 rounded text-[10px] font-bold ${statusClass}">${deposit.status}</span>
+        <span class="px-2 py-1 rounded-full text-[10px] font-bold bg-primary/20 text-primary">Completed</span>
       </td>
-      <td class="px-4 py-3 text-label-sm text-on-surface-variant">${deposit.date}</td>
+      <td class="px-4 py-3 text-label-sm text-on-surface-variant text-[10px]">
+        ${tx.createdAt ? new Date(tx.createdAt).toLocaleString('id-ID') : '—'}
+      </td>
       <td class="px-4 py-3 text-label-sm">
-        ${deposit.status === 'Pending' ? `
-          <button class="text-primary hover:underline text-[12px]" onclick="approveDeposit('${deposit.user}')">Approve</button>
-          <button class="text-error ml-2 hover:underline text-[12px]" onclick="rejectDeposit('${deposit.user}')">Reject</button>
-        ` : '-'}
+        <span class="px-2 py-1 rounded-full text-[10px] font-bold ${isBuy ? 'bg-primary/20 text-primary' : 'bg-error/20 text-error'}">${isBuy ? 'BUY' : 'SELL'}</span>
       </td>
     `;
     tbody.appendChild(row);
   });
 }
 
-// Render admin market monitoring
+// Render admin market monitoring — data dari stocks nyata
 function renderAdminMonitoringTable() {
   const tbody = document.querySelector('#adminMonitoringTable');
   if (!tbody) return;
   tbody.innerHTML = '';
-  
-  const markets = [
-    { name: 'IHSG', value: '7,205.12', change: '+0.45%', status: 'Active' },
-    { name: 'IDX30', value: '485.22', change: '+0.32%', status: 'Active' },
-    { name: 'LQ45', value: '912.45', change: '-0.12%', status: 'Active' },
-    { name: 'KOMPAS100', value: '1,245.67', change: '+0.58%', status: 'Active' },
-    { name: 'JII', value: '78.34', change: '+0.21%', status: 'Active' }
+
+  // Tampilkan indeks dari saham-saham di database sebagai rangkuman
+  const indices = [
+    { name: 'IHSG', label: 'Indeks Harga Saham Gabungan', source: 'composite' },
+    { name: 'IDX30', label: 'IDX 30 Blue Chip', source: 'bluechip' },
   ];
-  
-  markets.forEach(market => {
+
+  indices.forEach(idx => {
     const row = document.createElement('tr');
-    const changeColor = market.change.startsWith('+') ? 'text-primary' : 'text-error';
+    row.className = 'hover:bg-white/5 transition-colors';
     row.innerHTML = `
-      <td class="px-4 py-3 text-label-sm font-bold">${market.name}</td>
-      <td class="px-4 py-3 text-label-sm">${market.value}</td>
-      <td class="px-4 py-3 text-label-sm ${changeColor} font-bold">${market.change}</td>
+      <td class="px-4 py-3 text-label-sm font-bold font-data-tabular">${idx.name}</td>
+      <td class="px-4 py-3 text-label-sm text-on-surface-variant">${idx.label}</td>
+      <td class="px-4 py-3 text-label-sm">—</td>
       <td class="px-4 py-3 text-label-sm">
-        <span class="px-2 py-1 rounded text-[10px] font-bold bg-primary/20 text-primary flex items-center gap-1 w-fit">
-          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-          ${market.status}
+        <span class="flex items-center gap-1 w-fit px-2 py-1 rounded-full text-[10px] font-bold bg-primary/20 text-primary">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> Active
         </span>
       </td>
       <td class="px-4 py-3 text-label-sm">
-        <button class="text-primary hover:underline text-[12px]" onclick="pauseMarket('${market.name}')">Pause</button>
+        <button class="text-on-surface-variant hover:text-error text-[12px]" onclick="pauseMarket('${idx.name}')">Pause</button>
       </td>
     `;
     tbody.appendChild(row);
   });
-  
+
+  if (indices.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-label-sm text-on-surface-variant text-center">Tidak ada data indeks</td></tr>';
+  }
+
   renderStocksMonitoring();
 }
 
@@ -1084,17 +1242,24 @@ function renderStocksMonitoring() {
   const tbody = document.querySelector('#adminStocksMonitoringTable');
   if (!tbody) return;
   tbody.innerHTML = '';
-  
-  stocks.forEach(stock => {
-    const change = (Math.random() * 4 - 2).toFixed(2);
-    const changeColor = change > 0 ? 'text-primary' : 'text-error';
+
+  if (!adminStocks || adminStocks.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-label-sm text-on-surface-variant text-center">Tidak ada data saham</td></tr>';
+    return;
+  }
+
+  adminStocks.forEach(stock => {
+    const change = stock.changePercent ?? 0;
+    const changeColor = change > 0 ? 'text-primary' : change < 0 ? 'text-error' : 'text-on-surface-variant';
+    const changeStr = change > 0 ? `+${change}%` : `${change}%`;
     const row = document.createElement('tr');
+    row.className = 'hover:bg-white/5 transition-colors';
     row.innerHTML = `
-      <td class="px-4 py-3 text-label-sm font-bold">${stock.stockCode}</td>
-      <td class="px-4 py-3 text-label-sm">${stock.companyName}</td>
-      <td class="px-4 py-3 text-label-sm">Rp ${stock.price.toLocaleString('id-ID')}</td>
-      <td class="px-4 py-3 text-label-sm ${changeColor} font-bold">${change > 0 ? '+' : ''}${change}%</td>
-      <td class="px-4 py-3 text-label-sm">${stock.volume?.toLocaleString('id-ID') || 'N/A'}</td>
+      <td class="px-4 py-3 text-label-sm font-bold font-data-tabular text-primary">${stock.stockCode}</td>
+      <td class="px-4 py-3 text-label-sm">${stock.companyName || '—'}</td>
+      <td class="px-4 py-3 text-label-sm font-data-tabular font-bold">Rp ${(stock.price||0).toLocaleString('id-ID')}</td>
+      <td class="px-4 py-3 text-label-sm font-bold font-data-tabular ${changeColor}">${changeStr}</td>
+      <td class="px-4 py-3 text-label-sm font-data-tabular text-on-surface-variant">${(stock.volume||0).toLocaleString('id-ID')}</td>
       <td class="px-4 py-3 text-label-sm">
         <button class="text-primary hover:underline text-[12px]" onclick="editStockPrice('${stock.stockCode}')">Edit Harga</button>
       </td>
@@ -1120,9 +1285,26 @@ window.pauseMarket = async (marketName) => {
 };
 
 window.editStockPrice = async (stockCode) => {
-  const stock = stocks.find(s => s.stockCode === stockCode) || adminStocks.find(s => s.stockCode === stockCode);
+  const stock = adminStocks.find(s => s.stockCode === stockCode);
   const newPrice = await NusaEditPriceModal(stockCode, stock?.price || 0);
-  if (newPrice && newPrice > 0) {
-    NusaToast(`Harga ${stockCode} diperbarui menjadi Rp ${newPrice.toLocaleString('id-ID')}`, 'success');
+  if (!newPrice || newPrice <= 0) return;
+  try {
+    const response = await fetch(`/api/stocks/${stock._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+      body: JSON.stringify({ price: newPrice })
+    });
+    if (response.ok) {
+      NusaToast(`Harga ${stockCode} diperbarui menjadi Rp ${newPrice.toLocaleString('id-ID')}`, 'success');
+      await loadAdminDashboard();
+      renderAdminStocksTable();
+    } else {
+      NusaToast('Gagal memperbarui harga', 'error');
+    }
+  } catch (err) {
+    NusaToast('Error: ' + err.message, 'error');
   }
 };
