@@ -36,47 +36,37 @@ function setupIndexNavigation() {
     }
     
     if (logoutBtn) {
-      logoutBtn.onclick = () => {
+      logoutBtn.onclick = async () => {
+        const ok = await NusaConfirm({ title: 'Keluar dari NusaTrade?', message: 'Sesi Anda akan diakhiri.', danger: true, confirmText: 'Keluar' });
+        if (!ok) return;
         localStorage.removeItem('token');
         localStorage.removeItem('role');
         localStorage.removeItem('name');
-        alert('Logged out');
-        window.location.reload();
+        NusaToast('Berhasil keluar', 'success');
+        setTimeout(() => window.location.reload(), 800);
       };
     }
   } else {
     if (userPanel) userPanel.classList.add('hidden');
     loginBtn?.classList.remove('hidden');
+
+    const openLogin = async () => {
+      const result = await NusaLoginModal();
+      if (!result) return;
+      if (result.token) {
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('role', result.role || 'user');
+        localStorage.setItem('name', result.name || '');
+        NusaToast('Login berhasil! Selamat datang 👋', 'success');
+        setTimeout(() => {
+          if (result.role === 'admin') window.location.href = '/admindashboard.html';
+          else window.location.reload();
+        }, 800);
+      }
+    };
     
-    if (loginBtn) {
-      loginBtn.onclick = async (e) => {
-        e.preventDefault();
-        const email = prompt('Email:');
-        const password = prompt('Password:');
-        if (!email || !password) return;
-        
-        try {
-          const result = await API.login({ email, password });
-          if (result.token) {
-            localStorage.setItem('token', result.token);
-            localStorage.setItem('role', result.role || 'user');
-            localStorage.setItem('name', result.name || '');
-            alert('Login sukses!');
-            window.location.reload();
-          } else {
-            alert(result.message || 'Login failed');
-          }
-        } catch (err) {
-          alert('Login error: ' + err.message);
-        }
-      };
-    }
-    
-    if (tradingBtn) {
-      tradingBtn.onclick = () => {
-        if (loginBtn) loginBtn.click();
-      };
-    }
+    if (loginBtn) loginBtn.onclick = (e) => { e.preventDefault(); openLogin(); };
+    if (tradingBtn) tradingBtn.onclick = openLogin;
   }
 }
 
@@ -89,8 +79,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const isDashboardPage = window.location.pathname.includes('userdashboard') || window.location.pathname.includes('admindashboard');
   
   if (isDashboardPage && !token) {
-    alert('Silakan login terlebih dahulu');
-    window.location.href = '/index.html';
+    NusaToast('Silakan login terlebih dahulu', 'warning');
+    setTimeout(() => { window.location.href = '/index.html'; }, 900);
     return;
   }
 
@@ -246,21 +236,24 @@ function setupUserDashboardNavigation() {
 
   const logoutBtn = document.querySelector('#logoutBtn');
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
+    logoutBtn.addEventListener('click', async () => {
+      const ok = await NusaConfirm({ title: 'Keluar dari NusaTrade?', message: 'Sesi Anda akan diakhiri.', danger: true, confirmText: 'Keluar' });
+      if (!ok) return;
       localStorage.removeItem('token');
       localStorage.removeItem('role');
       localStorage.removeItem('name');
-      alert('Logged out');
-      window.location.href = '/index.html';
+      NusaToast('Berhasil keluar', 'success');
+      setTimeout(() => { window.location.href = '/index.html'; }, 800);
     });
   }
 
   const depositBtn = document.querySelector('#depositBtn');
   if (depositBtn) {
-    depositBtn.addEventListener('click', () => {
-      const amount = prompt('Jumlah deposit (IDR):');
-      if (amount && parseInt(amount) > 0) {
-        alert('Fitur deposit sedang dalam pengembangan. Hubungi support untuk info lebih lanjut.');
+    depositBtn.addEventListener('click', async () => {
+      const balance = currentUser?.balance || 0;
+      const result = await NusaDepositModal(balance);
+      if (result) {
+        NusaToast('Permintaan deposit sedang diproses. Tim kami akan menghubungi Anda.', 'info', 4000);
       }
     });
   }
@@ -490,21 +483,31 @@ function setupTradingPanel() {
     confirmBtn.addEventListener('click', async () => {
       const lot = parseInt(lotInput?.value) || 0;
       if (lot <= 0) {
-        alert('Please enter valid lot quantity');
+        NusaToast('Masukkan jumlah lot yang valid', 'error');
         return;
       }
       const stockCode = stockSelect?.value || selectedStock?.stockCode || 'BBCA';
+      const price = parseInt(priceInput?.value) || 0;
+      const fee   = Math.floor(lot * 100 * price * 0.0015);
+      const total = Math.floor(lot * 100 * price + fee);
+
+      const confirmed = await NusaTradeConfirmModal({
+        type: isBuyMode ? 'buy' : 'sell',
+        stockCode, lots: lot, price, fee, total
+      });
+      if (!confirmed) return;
+
       try {
         const result = isBuyMode ? await API.buy({ stockCode, lots: lot }) : await API.sell({ stockCode, lots: lot });
         if (result.ok) {
-          alert(isBuyMode ? 'Buy successful!' : 'Sell successful!');
+          NusaToast(isBuyMode ? '✅ Pembelian berhasil!' : '✅ Penjualan berhasil!', 'success');
           if (lotInput) lotInput.value = '';
           await loadUserDashboard();
         } else {
-          alert(result.message || (isBuyMode ? 'Buy failed' : 'Sell failed'));
+          NusaToast(result.message || (isBuyMode ? 'Pembelian gagal' : 'Penjualan gagal'), 'error');
         }
       } catch (err) {
-        alert('Error: ' + err.message);
+        NusaToast('Error: ' + err.message, 'error');
       }
     });
     confirmBtn.dataset.bound = 'true';
@@ -588,29 +591,23 @@ function renderPortfolioSection() {
 }
 
 function createStockForm() {
-  const code = prompt('Kode saham (misal: BBCA):');
-  if (!code) return null;
-  const companyName = prompt('Nama perusahaan:');
-  if (!companyName) return null;
-  const price = parseInt(prompt('Harga awal (IDR):'), 10);
-  if (!price || price <= 0) return null;
-  const volume = parseInt(prompt('Volume awal:'), 10) || 0;
-  return { stockCode: code.toUpperCase(), companyName, price, volume };
+  // replaced by NusaCreateStockModal – kept as stub
+  return null;
 }
 
 window.createStock = async () => {
-  const data = createStockForm();
+  const data = await NusaCreateStockModal();
   if (!data) return;
   try {
     const result = await API.createStock(data);
     if (result._id || result.ok) {
-      alert('Stock created successfully');
+      NusaToast('Saham berhasil ditambahkan', 'success');
       await loadAdminDashboard();
     } else {
-      alert(result.message || 'Create stock failed');
+      NusaToast(result.message || 'Gagal menambahkan saham', 'error');
     }
   } catch (err) {
-    alert('Error: ' + err.message);
+    NusaToast('Error: ' + err.message, 'error');
   }
 }
 
@@ -757,12 +754,14 @@ function setupAdminDashboardNavigation() {
   // Setup admin logout
   const adminLogoutBtn = document.querySelector('#adminLogoutBtn');
   if (adminLogoutBtn) {
-    adminLogoutBtn.addEventListener('click', () => {
+    adminLogoutBtn.addEventListener('click', async () => {
+      const ok = await NusaConfirm({ title: 'Keluar dari Admin Panel?', message: 'Sesi admin Anda akan diakhiri.', danger: true, confirmText: 'Keluar' });
+      if (!ok) return;
       localStorage.removeItem('token');
       localStorage.removeItem('role');
       localStorage.removeItem('name');
-      alert('Logged out');
-      window.location.href = '/index.html';
+      NusaToast('Berhasil keluar dari admin panel', 'success');
+      setTimeout(() => { window.location.href = '/index.html'; }, 800);
     });
   }
 }
@@ -869,80 +868,104 @@ function createTableContainer(title) {
 
 // Global functions for admin actions
 window.editUser = async (userId) => {
-  const newBalance = prompt('Enter new balance (IDR):');
-  if (newBalance) {
-    try {
-      const response = await fetch(`/api/users/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
-        body: JSON.stringify({ balance: parseInt(newBalance) })
-      });
-      if (response.ok) {
-        alert('User updated successfully');
-        await loadAdminDashboard();
-      }
-    } catch (err) {
-      alert('Error: ' + err.message);
+  const user = adminUsers.find(u => u._id === userId);
+  if (!user) return;
+  const data = await NusaEditUserModal(user);
+  if (!data) return;
+  try {
+    const response = await fetch(`/api/users/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+      body: JSON.stringify(data)
+    });
+    if (response.ok) {
+      NusaToast('Data pengguna berhasil diperbarui', 'success');
+      await loadAdminDashboard();
+      renderAdminUsersTable();
+    } else {
+      NusaToast('Gagal memperbarui pengguna', 'error');
     }
+  } catch (err) {
+    NusaToast('Error: ' + err.message, 'error');
   }
 };
 
 window.deleteUser = async (userId) => {
-  if (confirm('Are you sure?')) {
-    try {
-      const response = await fetch(`/api/users/${userId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-      });
-      if (response.ok) {
-        alert('User deleted successfully');
-        await loadAdminDashboard();
-      }
-    } catch (err) {
-      alert('Error: ' + err.message);
+  const user = adminUsers.find(u => u._id === userId);
+  const ok = await NusaConfirm({
+    title: 'Hapus Pengguna?',
+    message: `Akun <strong>${user?.name || 'ini'}</strong> akan dihapus permanen.`,
+    danger: true, confirmText: 'Hapus', cancelText: 'Batal'
+  });
+  if (!ok) return;
+  try {
+    const response = await fetch(`/api/users/${userId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+    });
+    if (response.ok) {
+      NusaToast('Pengguna berhasil dihapus', 'success');
+      await loadAdminDashboard();
+      renderAdminUsersTable();
+    } else {
+      NusaToast('Gagal menghapus pengguna', 'error');
     }
+  } catch (err) {
+    NusaToast('Error: ' + err.message, 'error');
   }
 };
 
 window.editStock = async (stockId) => {
-  const newPrice = prompt('Enter new price (IDR):');
-  if (newPrice) {
-    try {
-      const response = await fetch(`/api/stocks/${stockId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
-        body: JSON.stringify({ price: parseInt(newPrice) })
-      });
-      if (response.ok) {
-        alert('Stock updated successfully');
-        await loadAdminDashboard();
-      }
-    } catch (err) {
-      alert('Error: ' + err.message);
+  const stock = adminStocks.find(s => s._id === stockId);
+  if (!stock) return;
+  const data = await NusaEditStockModal(stock);
+  if (!data) return;
+  try {
+    const response = await fetch(`/api/stocks/${stockId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+      body: JSON.stringify(data)
+    });
+    if (response.ok) {
+      NusaToast('Data saham berhasil diperbarui', 'success');
+      await loadAdminDashboard();
+      renderAdminStocksTable();
+    } else {
+      NusaToast('Gagal memperbarui saham', 'error');
     }
+  } catch (err) {
+    NusaToast('Error: ' + err.message, 'error');
   }
 };
 
 window.deleteStock = async (stockId) => {
-  if (confirm('Are you sure?')) {
-    try {
-      const response = await fetch(`/api/stocks/${stockId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-      });
-      if (response.ok) {
-        alert('Stock deleted successfully');
-        await loadAdminDashboard();
-      }
-    } catch (err) {
-      alert('Error: ' + err.message);
+  const stock = adminStocks.find(s => s._id === stockId);
+  const ok = await NusaConfirm({
+    title: 'Hapus Saham?',
+    message: `Saham <strong>${stock?.stockCode || 'ini'}</strong> akan dihapus dari listing.`,
+    danger: true, confirmText: 'Hapus', cancelText: 'Batal'
+  });
+  if (!ok) return;
+  try {
+    const response = await fetch(`/api/stocks/${stockId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+    });
+    if (response.ok) {
+      NusaToast('Saham berhasil dihapus', 'success');
+      await loadAdminDashboard();
+      renderAdminStocksTable();
+    } else {
+      NusaToast('Gagal menghapus saham', 'error');
     }
+  } catch (err) {
+    NusaToast('Error: ' + err.message, 'error');
   }
 };
 
@@ -1045,21 +1068,25 @@ function renderStocksMonitoring() {
 }
 
 // Global functions for deposits and monitoring
-window.approveDeposit = (userId) => {
-  alert(`Deposit dari ${userId} telah disetujui!`);
+window.approveDeposit = async (userId) => {
+  const ok = await NusaConfirm({ title: 'Setujui Deposit?', message: `Deposit dari <strong>${userId}</strong> akan disetujui.`, confirmText: 'Setujui' });
+  if (ok) NusaToast(`Deposit dari ${userId} telah disetujui`, 'success');
 };
 
-window.rejectDeposit = (userId) => {
-  alert(`Deposit dari ${userId} telah ditolak!`);
+window.rejectDeposit = async (userId) => {
+  const ok = await NusaConfirm({ title: 'Tolak Deposit?', message: `Deposit dari <strong>${userId}</strong> akan ditolak.`, danger: true, confirmText: 'Tolak' });
+  if (ok) NusaToast(`Deposit dari ${userId} telah ditolak`, 'error');
 };
 
-window.pauseMarket = (marketName) => {
-  alert(`Market ${marketName} telah di-pause!`);
+window.pauseMarket = async (marketName) => {
+  const ok = await NusaConfirm({ title: `Pause Market ${marketName}?`, message: 'Semua trading pada indeks ini akan dihentikan sementara.', danger: true, confirmText: 'Pause' });
+  if (ok) NusaToast(`Market ${marketName} telah di-pause`, 'warning');
 };
 
-window.editStockPrice = (stockCode) => {
-  const newPrice = prompt(`Harga baru untuk ${stockCode} (IDR):`);
-  if (newPrice && parseInt(newPrice) > 0) {
-    alert(`Harga ${stockCode} akan diubah menjadi Rp ${parseInt(newPrice).toLocaleString('id-ID')}`);
+window.editStockPrice = async (stockCode) => {
+  const stock = stocks.find(s => s.stockCode === stockCode) || adminStocks.find(s => s.stockCode === stockCode);
+  const newPrice = await NusaEditPriceModal(stockCode, stock?.price || 0);
+  if (newPrice && newPrice > 0) {
+    NusaToast(`Harga ${stockCode} diperbarui menjadi Rp ${newPrice.toLocaleString('id-ID')}`, 'success');
   }
 };
