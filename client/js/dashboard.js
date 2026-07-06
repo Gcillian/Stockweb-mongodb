@@ -558,6 +558,14 @@ function loadTransactionHistory(history) {
 // Load admin dashboard
 async function loadAdminDashboard() {
   try {
+    // Check admin role before making API calls
+    const role = localStorage.getItem('role');
+    if (role !== 'admin') {
+      NusaToast('Akses ditolak: Anda bukan admin', 'error');
+      setTimeout(() => { window.location.href = '/index.html'; }, 1500);
+      return;
+    }
+
     // Muat data paralel untuk kecepatan
     const [users, stockList, transactions, stats] = await Promise.all([
       API.users(),
@@ -566,9 +574,14 @@ async function loadAdminDashboard() {
       API.stats()
     ]);
 
-    adminUsers = users || [];
-    adminStocks = stockList || [];
-    adminTransactions = transactions || [];
+    adminUsers = Array.isArray(users) ? users : [];
+    adminStocks = Array.isArray(stockList) ? stockList : [];
+    adminTransactions = Array.isArray(transactions) ? transactions : [];
+
+    // If API returned 403/error for users, show warning
+    if (!Array.isArray(users) && users?.message) {
+      console.warn('API error fetching users:', users.message);
+    }
 
     // Populate stat cards dari data nyata
     populateAdminStats(stats, adminUsers, adminStocks, adminTransactions);
