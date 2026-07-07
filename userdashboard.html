@@ -593,14 +593,59 @@
 <!-- Settings Section -->
 <div id="settingsSection" class="section-content hidden">
 <h2 class="text-headline-lg font-headline-lg mb-6">Pengaturan</h2>
-<div class="glass-card rounded-xl p-5 space-y-6">
-<div>
-<h3 class="font-bold mb-2">Profil Anda</h3>
-<p id="settingUserName" class="text-label-sm text-on-surface-variant"></p>
-<p id="settingUserEmail" class="text-label-sm text-on-surface-variant"></p>
-<p id="settingUserBalance" class="text-label-sm font-bold mt-2"></p>
+
+<!-- Profile Card -->
+<div class="glass-card rounded-xl p-5 mb-6">
+  <h3 class="font-bold mb-4 flex items-center gap-2">
+    <span class="material-symbols-outlined text-primary text-[20px]">person</span>
+    Profil Anda
+  </h3>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-surface-container rounded-lg p-4">
+      <p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">Nama</p>
+      <p id="settingUserName" class="font-bold"></p>
+    </div>
+    <div class="bg-surface-container rounded-lg p-4">
+      <p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">Email</p>
+      <p id="settingUserEmail" class="text-label-sm text-on-surface-variant"></p>
+    </div>
+    <div class="bg-surface-container rounded-lg p-4 border border-primary/20">
+      <p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">Saldo</p>
+      <p id="settingUserBalance" class="font-bold text-primary font-data-tabular"></p>
+    </div>
+  </div>
 </div>
+
+<!-- Riwayat Deposit -->
+<div class="glass-card rounded-xl overflow-hidden">
+  <div class="p-5 border-b border-white/5 flex items-center justify-between">
+    <h3 class="font-bold flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary text-[20px]">payments</span>
+      Riwayat Deposit
+    </h3>
+    <button onclick="loadMyDeposits()"
+      class="flex items-center gap-1 px-3 py-1.5 bg-surface-container border border-white/10 rounded-lg text-label-sm hover:bg-surface-container-high transition-all">
+      <span class="material-symbols-outlined text-[14px]">refresh</span> Refresh
+    </button>
+  </div>
+  <div class="overflow-x-auto custom-scrollbar">
+    <table class="w-full text-left text-label-sm">
+      <thead class="bg-surface-container-low text-on-surface-variant text-[10px] uppercase tracking-[0.08em]">
+        <tr>
+          <th class="px-4 py-3">Jumlah</th>
+          <th class="px-4 py-3">Metode</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Waktu Request</th>
+          <th class="px-4 py-3">Keterangan</th>
+        </tr>
+      </thead>
+      <tbody id="myDepositTable" class="divide-y divide-white/5 font-data-tabular">
+        <tr><td colspan="5" class="px-4 py-8 text-label-sm text-on-surface-variant text-center animate-pulse">Memuat riwayat deposit...</td></tr>
+      </tbody>
+    </table>
+  </div>
 </div>
+
 </div>
 
 <!-- Help Section -->

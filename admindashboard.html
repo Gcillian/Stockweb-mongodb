@@ -174,7 +174,8 @@
 </a>
 <a data-admin-menu="deposits" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'deposits')" class="admin-menu-link flex items-center gap-xs px-md py-sm text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors duration-200 cursor-pointer" href="javascript:void(0)">
 <span class="material-symbols-outlined" data-icon="payments">payments</span>
-<span>Deposits &amp; Withdrawals</span>
+<span class="flex-1">Deposits</span>
+<span id="adminDepositPendingBadge" class="hidden min-w-[18px] h-[18px] px-1 bg-yellow-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
 </a>
 <a data-admin-menu="monitoring" onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(this, 'monitoring')" class="admin-menu-link flex items-center gap-xs px-md py-sm text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors duration-200 cursor-pointer" href="javascript:void(0)">
 <span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
@@ -431,6 +432,17 @@
 </div>
 <span id="adminSumStocks" class="font-bold font-data-tabular">—</span>
 </div>
+<div class="flex items-center justify-between p-sm rounded-lg bg-yellow-500/10 border border-yellow-500/20 cursor-pointer hover:bg-yellow-500/15 transition-all"
+     onclick="window.__nusatradeAdminMenuClick && window.__nusatradeAdminMenuClick(null,'deposits')">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-yellow-400 text-[20px]">pending_actions</span>
+<span class="font-label-sm text-yellow-400">Deposit Pending</span>
+</div>
+<div class="flex items-center gap-2">
+  <span id="adminSumDepositPending" class="font-bold text-yellow-400 font-data-tabular">—</span>
+  <span class="material-symbols-outlined text-yellow-400 text-[14px]">arrow_forward_ios</span>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -578,28 +590,91 @@
 
 <!-- Deposits Section -->
 <div id="adminDepositsSection" class="admin-section hidden p-lg">
-<h2 class="font-headline-lg text-headline-lg mb-6">Deposits &amp; Withdrawals</h2>
-<div class="glass-card rounded-xl overflow-hidden">
-  <div class="p-md border-b border-white/5 bg-surface-container-low">
-    <h3 class="font-headline-md text-[18px]">Deposit Requests</h3>
-    <p class="text-label-sm text-on-surface-variant">Kelola request deposit dan penarikan pengguna</p>
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="font-headline-lg text-headline-lg">Deposits &amp; Withdrawals</h2>
+      <p class="text-label-sm text-on-surface-variant mt-1">Kelola seluruh permintaan deposit pengguna</p>
+    </div>
+    <button onclick="renderAdminDepositsTable()" class="flex items-center gap-2 px-4 py-2 bg-surface-container border border-white/10 rounded-lg text-label-sm hover:bg-surface-container-high transition-all">
+      <span class="material-symbols-outlined text-[16px]">refresh</span> Refresh
+    </button>
   </div>
-  <div class="overflow-x-auto custom-scrollbar">
-    <table class="w-full text-left text-label-sm">
-      <thead class="bg-surface-container-low text-on-surface-variant text-[10px] uppercase tracking-[0.08em]">
-        <tr>
-          <th class="px-4 py-3">User</th>
-          <th class="px-4 py-3">Amount</th>
-          <th class="px-4 py-3">Method</th>
-          <th class="px-4 py-3">Status</th>
-          <th class="px-4 py-3">Date</th>
-          <th class="px-4 py-3">Action</th>
-        </tr>
-      </thead>
-      <tbody id="adminDepositsTable" class="divide-y divide-white/5 font-data-tabular"></tbody>
-    </table>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-6">
+    <div class="glass-card p-md rounded-xl">
+      <p class="text-on-surface-variant font-label-sm mb-1">Pending</p>
+      <div class="flex items-baseline gap-2">
+        <span id="adminDepositPendingCount" class="font-headline-md text-headline-md font-bold text-yellow-400">—</span>
+        <span class="text-label-sm text-on-surface-variant">permintaan</span>
+      </div>
+      <p id="adminDepositPendingTotal" class="text-label-sm text-on-surface-variant mt-2">—</p>
+    </div>
+    <div class="glass-card p-md rounded-xl">
+      <p class="text-on-surface-variant font-label-sm mb-1">Total Approved</p>
+      <div class="flex items-baseline gap-2">
+        <span id="adminDepositApprovedTotal" class="font-headline-md text-headline-md font-bold text-primary">—</span>
+      </div>
+      <p class="text-label-sm text-on-surface-variant mt-2">Sudah masuk ke saldo user</p>
+    </div>
+    <div class="glass-card p-md rounded-xl border-yellow-500/20 bg-yellow-500/5">
+      <p class="text-yellow-400 font-label-sm mb-1">⚡ Butuh Perhatian</p>
+      <p class="text-label-sm text-on-surface-variant">
+        Deposit dengan status <strong class="text-yellow-400">Pending</strong> perlu di-approve atau di-reject agar saldo user diperbarui.
+      </p>
+    </div>
   </div>
-</div>
+
+  <!-- Filter Tabs -->
+  <div class="flex gap-2 mb-4">
+    <button onclick="renderAdminDepositsTable('')"
+      class="dep-filter-btn px-4 py-2 rounded-lg text-label-sm font-bold bg-primary text-on-primary" data-filter="">
+      Semua
+    </button>
+    <button onclick="renderAdminDepositsTable('pending')"
+      class="dep-filter-btn px-4 py-2 rounded-lg text-label-sm font-bold bg-surface-container border border-white/10 text-on-surface-variant hover:border-yellow-500/40 hover:text-yellow-400 transition-all" data-filter="pending">
+      <span class="flex items-center gap-1">
+        <span class="w-2 h-2 rounded-full bg-yellow-400"></span> Pending
+      </span>
+    </button>
+    <button onclick="renderAdminDepositsTable('approved')"
+      class="dep-filter-btn px-4 py-2 rounded-lg text-label-sm font-bold bg-surface-container border border-white/10 text-on-surface-variant hover:border-primary/40 hover:text-primary transition-all" data-filter="approved">
+      <span class="flex items-center gap-1">
+        <span class="w-2 h-2 rounded-full bg-primary"></span> Approved
+      </span>
+    </button>
+    <button onclick="renderAdminDepositsTable('rejected')"
+      class="dep-filter-btn px-4 py-2 rounded-lg text-label-sm font-bold bg-surface-container border border-white/10 text-on-surface-variant hover:border-error/40 hover:text-error transition-all" data-filter="rejected">
+      <span class="flex items-center gap-1">
+        <span class="w-2 h-2 rounded-full bg-error"></span> Rejected
+      </span>
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="glass-card rounded-xl overflow-hidden">
+    <div class="overflow-x-auto custom-scrollbar">
+      <table class="w-full text-left text-label-sm">
+        <thead class="bg-surface-container-low text-on-surface-variant text-[10px] uppercase tracking-[0.08em] sticky top-0">
+          <tr>
+            <th class="px-4 py-3">User</th>
+            <th class="px-4 py-3">Jumlah</th>
+            <th class="px-4 py-3">Metode</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Waktu Request</th>
+            <th class="px-4 py-3">Diproses</th>
+            <th class="px-4 py-3">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="adminDepositsTable" class="divide-y divide-white/5 font-data-tabular">
+          <tr><td colspan="7" class="px-4 py-8 text-label-sm text-on-surface-variant text-center animate-pulse">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <!-- Market Monitoring Section -->

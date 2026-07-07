@@ -9,6 +9,7 @@ const stockRoutes = require('./routes/stocks');
 const tradingRoutes = require('./routes/trading');
 const portfolioRoutes = require('./routes/portfolio');
 const adminRoutes = require('./routes/admin');
+const depositRoutes = require('./routes/deposit');
 
 const app = express();
 app.use(cors());
@@ -36,6 +37,7 @@ app.use('/api', stockRoutes);
 app.use('/api', tradingRoutes);
 app.use('/api', portfolioRoutes);
 app.use('/api', adminRoutes);
+app.use('/api', depositRoutes);
 
 // Serve static files (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, '..')));

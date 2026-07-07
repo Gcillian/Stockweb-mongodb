@@ -253,8 +253,17 @@ function setupUserDashboardNavigation() {
     depositBtn.addEventListener('click', async () => {
       const balance = currentUser?.balance || 0;
       const result = await NusaDepositModal(balance);
-      if (result) {
-        NusaToast('Permintaan deposit sedang diproses. Tim kami akan menghubungi Anda.', 'info', 4000);
+      if (!result) return;
+
+      try {
+        const res = await API.submitDeposit({ amount: result.amount, method: result.method });
+        if (res.ok) {
+          NusaToast('Permintaan deposit berhasil dikirim! Menunggu persetujuan admin.', 'success', 5000);
+        } else {
+          NusaToast(res.message || 'Gagal mengirim permintaan deposit', 'error');
+        }
+      } catch (err) {
+        NusaToast('Error: ' + err.message, 'error');
       }
     });
   }
@@ -350,12 +359,66 @@ function renderHistoryView() {
 // Render settings view
 function renderSettingsView() {
   if (currentUser) {
-    const userNameEl = document.querySelector('#settingUserName');
-    const userEmailEl = document.querySelector('#settingUserEmail');
+    const userNameEl    = document.querySelector('#settingUserName');
+    const userEmailEl   = document.querySelector('#settingUserEmail');
     const userBalanceEl = document.querySelector('#settingUserBalance');
-    if (userNameEl) userNameEl.innerText = `Nama: ${currentUser.name}`;
-    if (userEmailEl) userEmailEl.innerText = `Email: ${currentUser.email}`;
-    if (userBalanceEl) userBalanceEl.innerText = `Saldo: ${formatCurrency(currentUser.balance)}`;
+    if (userNameEl)    userNameEl.innerText    = currentUser.name  || '—';
+    if (userEmailEl)   userEmailEl.innerText   = currentUser.email || '—';
+    if (userBalanceEl) userBalanceEl.innerText = formatCurrency(currentUser.balance);
+  }
+  loadMyDeposits();
+}
+
+// Load riwayat deposit milik user sendiri
+async function loadMyDeposits() {
+  const tbody = document.querySelector('#myDepositTable');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-label-sm text-on-surface-variant text-center animate-pulse">Memuat...</td></tr>';
+
+  try {
+    const deposits = await API.myDeposits();
+    tbody.innerHTML = '';
+
+    if (!deposits || deposits.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-label-sm text-on-surface-variant text-center">Belum ada riwayat deposit</td></tr>';
+      return;
+    }
+
+    const statusCfg = {
+      pending:  { cls: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30', label: 'Menunggu',  icon: 'schedule' },
+      approved: { cls: 'bg-primary/20 text-primary border border-primary/30',          label: 'Disetujui', icon: 'check_circle' },
+      rejected: { cls: 'bg-error/20 text-error border border-error/30',                label: 'Ditolak',   icon: 'cancel' },
+    };
+    const methodLabel = { transfer: 'Bank Transfer', ewallet: 'E-Wallet', virtual: 'Virtual Account' };
+
+    deposits.forEach(dep => {
+      const s = statusCfg[dep.status] || statusCfg.pending;
+      const row = document.createElement('tr');
+      row.className = 'hover:bg-white/5 transition-colors';
+      row.innerHTML = `
+        <td class="px-4 py-3 font-bold font-data-tabular text-primary">
+          Rp ${(dep.amount || 0).toLocaleString('id-ID')}
+        </td>
+        <td class="px-4 py-3 text-label-sm text-on-surface-variant">
+          ${methodLabel[dep.method] || dep.method}
+        </td>
+        <td class="px-4 py-3">
+          <span class="flex items-center gap-1 w-fit px-2 py-1 rounded-full text-[10px] font-bold ${s.cls}">
+            <span class="material-symbols-outlined text-[12px]">${s.icon}</span>${s.label}
+          </span>
+        </td>
+        <td class="px-4 py-3 text-[10px] text-on-surface-variant">
+          ${dep.createdAt ? new Date(dep.createdAt).toLocaleString('id-ID') : '—'}
+        </td>
+        <td class="px-4 py-3 text-[10px] text-on-surface-variant">
+          ${dep.note || (dep.status === 'pending' ? 'Menunggu persetujuan admin' : '—')}
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-label-sm text-error text-center">${err.message}</td></tr>`;
   }
 }
 
@@ -557,32 +620,67 @@ function loadTransactionHistory(history) {
 
 // Load admin dashboard
 async function loadAdminDashboard() {
+  // Validasi dulu: pastikan token ada dan role adalah admin
+  const token = localStorage.getItem('token');
+  const role  = localStorage.getItem('role');
+
+  if (!token) {
+    NusaToast('Tidak ada token. Silakan login ulang.', 'error');
+    setTimeout(() => { window.location.href = '/index.html'; }, 1000);
+    return;
+  }
+
+  if (role !== 'admin') {
+    NusaToast('Akun Anda bukan admin.', 'error');
+    setTimeout(() => { window.location.href = '/userdashboard.html'; }, 1000);
+    return;
+  }
+
   try {
-    // Muat data paralel untuk kecepatan
-    const [users, stockList, transactions, stats] = await Promise.all([
+    // Muat data secara individual agar jika salah satu gagal tidak memblokir yang lain
+    const [usersRes, stocksRes, txRes, statsRes] = await Promise.allSettled([
       API.users(),
       API.stocks(),
       API.transactions(),
       API.stats()
     ]);
 
-    adminUsers = users || [];
-    adminStocks = stockList || [];
-    adminTransactions = transactions || [];
+    // Ambil nilai atau fallback ke array kosong
+    adminUsers        = usersRes.status  === 'fulfilled' && Array.isArray(usersRes.value)  ? usersRes.value  : [];
+    adminStocks       = stocksRes.status === 'fulfilled' && Array.isArray(stocksRes.value) ? stocksRes.value : [];
+    adminTransactions = txRes.status     === 'fulfilled' && Array.isArray(txRes.value)     ? txRes.value     : [];
+    const stats       = statsRes.status  === 'fulfilled' ? statsRes.value : null;
 
-    // Populate stat cards dari data nyata
+    // Log hasil untuk debugging
+    console.log('[Admin] users:', adminUsers.length, '| stocks:', adminStocks.length, '| tx:', adminTransactions.length);
+
+    // Cek jika users kosong padahal response sukses — berarti 403/401
+    if (usersRes.status === 'fulfilled' && !Array.isArray(usersRes.value)) {
+      const msg = usersRes.value?.message || 'Unknown error';
+      console.warn('[Admin] /users returned non-array:', msg);
+      if (msg.toLowerCase().includes('admin') || msg.toLowerCase().includes('token')) {
+        NusaToast('Sesi admin tidak valid. Silakan login ulang.', 'error');
+        setTimeout(() => { window.location.href = '/index.html'; }, 1500);
+        return;
+      }
+    }
+
+    // Populate semua bagian dashboard
     populateAdminStats(stats, adminUsers, adminStocks, adminTransactions);
-
-    // Populate tabel kecil di dashboard section
     loadUsersTable(adminUsers);
     loadStocksTable(adminStocks);
     loadTransactionsTable(adminTransactions);
-
-    // Populate gainers & losers
     populateGainersLosers(stats);
+    updateDepositStats(); // muat stats deposit (pending count, dll)
+
+    // Tampilkan peringatan jika ada yang gagal
+    if (usersRes.status  === 'rejected') NusaToast('Gagal memuat data users: ' + usersRes.reason?.message, 'error');
+    if (stocksRes.status === 'rejected') NusaToast('Gagal memuat data saham: ' + stocksRes.reason?.message, 'error');
+    if (txRes.status     === 'rejected') NusaToast('Gagal memuat transaksi: '  + txRes.reason?.message,    'error');
 
   } catch (err) {
     console.error('Error loading admin dashboard:', err);
+    NusaToast('Error: ' + err.message, 'error');
   }
 }
 
@@ -1163,41 +1261,183 @@ window.deleteStock = async (stockId) => {
   }
 };
 
-// Render admin deposits table — data dari transaksi (beli = deposit aksi, jual = withdrawal aksi)
-function renderAdminDepositsTable() {
+// Render admin deposits table — data dari Deposit collection
+let adminDeposits = []; // cache global
+
+async function renderAdminDepositsTable(filterStatus = '') {
   const tbody = document.querySelector('#adminDepositsTable');
   if (!tbody) return;
-  tbody.innerHTML = '';
 
-  // Ambil transaksi terbaru sebagai proxy deposit/withdrawal activity
-  // (jika ada Deposit model terpisah di masa depan, ganti di sini)
-  const recent = adminTransactions.slice(0, 30);
-
-  if (recent.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-6 text-label-sm text-on-surface-variant text-center">Tidak ada data transaksi</td></tr>';
-    return;
-  }
-
-  recent.forEach(tx => {
-    const isBuy = tx.type === 'buy';
-    const row = document.createElement('tr');
-    row.className = 'hover:bg-white/5 transition-colors';
-    row.innerHTML = `
-      <td class="px-4 py-3 text-label-sm text-on-surface-variant">${tx.userId || '—'}</td>
-      <td class="px-4 py-3 text-label-sm font-bold font-data-tabular">Rp ${(tx.total||0).toLocaleString('id-ID')}</td>
-      <td class="px-4 py-3 text-label-sm">${tx.stockCode}</td>
-      <td class="px-4 py-3 text-label-sm">
-        <span class="px-2 py-1 rounded-full text-[10px] font-bold bg-primary/20 text-primary">Completed</span>
-      </td>
-      <td class="px-4 py-3 text-label-sm text-on-surface-variant text-[10px]">
-        ${tx.createdAt ? new Date(tx.createdAt).toLocaleString('id-ID') : '—'}
-      </td>
-      <td class="px-4 py-3 text-label-sm">
-        <span class="px-2 py-1 rounded-full text-[10px] font-bold ${isBuy ? 'bg-primary/20 text-primary' : 'bg-error/20 text-error'}">${isBuy ? 'BUY' : 'SELL'}</span>
-      </td>
-    `;
-    tbody.appendChild(row);
+  // Update filter tab styling
+  document.querySelectorAll('.dep-filter-btn').forEach(btn => {
+    const isActive = btn.dataset.filter === filterStatus;
+    btn.className = btn.className
+      .replace('bg-primary text-on-primary', '')
+      .replace('bg-surface-container border border-white/10 text-on-surface-variant', '')
+      .trim();
+    if (isActive) {
+      btn.classList.add('bg-primary', 'text-on-primary');
+    } else {
+      btn.classList.add('bg-surface-container', 'border', 'border-white/10', 'text-on-surface-variant');
+    }
   });
+
+  tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-label-sm text-on-surface-variant text-center animate-pulse">Memuat data deposit...</td></tr>';
+
+  try {
+    adminDeposits = await API.adminDeposits(filterStatus);
+
+    tbody.innerHTML = '';
+    if (!adminDeposits.length) {
+      const msg = filterStatus
+        ? `Tidak ada deposit dengan status <strong>${filterStatus}</strong>`
+        : 'Belum ada permintaan deposit';
+      tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-10 text-label-sm text-on-surface-variant text-center">${msg}</td></tr>`;
+      await updateDepositStats();
+      return;
+    }
+
+    adminDeposits.forEach(dep => {
+      const statusCfg = {
+        pending:  { cls: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30', label: 'Pending',  icon: 'schedule' },
+        approved: { cls: 'bg-primary/20 text-primary border border-primary/30',          label: 'Approved', icon: 'check_circle' },
+        rejected: { cls: 'bg-error/20 text-error border border-error/30',                label: 'Rejected', icon: 'cancel' },
+      };
+      const s = statusCfg[dep.status] || statusCfg.pending;
+      const methodLabel = { transfer: 'Bank Transfer', ewallet: 'E-Wallet', virtual: 'Virtual Account' };
+
+      const row = document.createElement('tr');
+      row.className = 'hover:bg-white/5 transition-colors';
+      row.innerHTML = `
+        <td class="px-4 py-3">
+          <div class="flex flex-col">
+            <span class="text-label-sm font-bold">${dep.userName || '—'}</span>
+            <span class="text-[10px] text-on-surface-variant">${dep.userEmail || '—'}</span>
+          </div>
+        </td>
+        <td class="px-4 py-3">
+          <span class="font-bold font-data-tabular text-primary">Rp ${(dep.amount || 0).toLocaleString('id-ID')}</span>
+        </td>
+        <td class="px-4 py-3 text-label-sm text-on-surface-variant">
+          ${methodLabel[dep.method] || dep.method}
+        </td>
+        <td class="px-4 py-3">
+          <span class="flex items-center gap-1 w-fit px-2 py-1 rounded-full text-[10px] font-bold ${s.cls}">
+            <span class="material-symbols-outlined text-[12px]">${s.icon}</span>${s.label}
+          </span>
+        </td>
+        <td class="px-4 py-3 text-[10px] text-on-surface-variant">
+          ${dep.createdAt ? new Date(dep.createdAt).toLocaleString('id-ID') : '—'}
+        </td>
+        <td class="px-4 py-3 text-[10px]">
+          ${dep.processedAt
+            ? `<span class="text-on-surface-variant">${new Date(dep.processedAt).toLocaleString('id-ID')}</span>
+               ${dep.approvedBy ? `<br><span class="text-primary text-[9px]">oleh ${dep.approvedBy}</span>` : ''}`
+            : '<span class="text-on-surface-variant/40">—</span>'}
+        </td>
+        <td class="px-4 py-3">
+          ${dep.status === 'pending'
+            ? `<div class="flex gap-2">
+                <button onclick="doApproveDeposit('${dep._id}')"
+                  class="flex items-center gap-1 px-3 py-1.5 bg-primary/10 border border-primary/30 text-primary rounded-lg text-[11px] font-bold hover:bg-primary/20 active:scale-95 transition-all">
+                  <span class="material-symbols-outlined text-[13px]">check_circle</span> Approve
+                </button>
+                <button onclick="doRejectDeposit('${dep._id}')"
+                  class="flex items-center gap-1 px-3 py-1.5 bg-error/10 border border-error/30 text-error rounded-lg text-[11px] font-bold hover:bg-error/20 active:scale-95 transition-all">
+                  <span class="material-symbols-outlined text-[13px]">cancel</span> Reject
+                </button>
+               </div>`
+            : `<span class="text-[10px] text-on-surface-variant/60 italic">${dep.note || '—'}</span>`}
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    await updateDepositStats();
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-6 text-label-sm text-error text-center">
+      <span class="material-symbols-outlined align-middle mr-1">error</span>${err.message}
+    </td></tr>`;
+  }
+}
+
+window.doApproveDeposit = async (depositId) => {
+  const dep = adminDeposits.find(d => d._id === depositId);
+  const ok = await NusaConfirm({
+    title: 'Setujui Deposit?',
+    message: `Deposit sebesar <strong>Rp ${(dep?.amount || 0).toLocaleString('id-ID')}</strong> dari <strong>${dep?.userName || '—'}</strong> akan disetujui dan saldo user akan bertambah.`,
+    confirmText: 'Approve',
+    cancelText: 'Batal'
+  });
+  if (!ok) return;
+
+  try {
+    const res = await API.approveDeposit(depositId);
+    if (res.ok) {
+      NusaToast(`✅ Deposit Rp ${(dep?.amount || 0).toLocaleString('id-ID')} disetujui. Saldo baru: Rp ${(res.newBalance || 0).toLocaleString('id-ID')}`, 'success', 5000);
+      await renderAdminDepositsTable();
+      // Refresh stats juga
+      const stats = await API.stats().catch(() => null);
+      if (stats) populateAdminStats(stats, adminUsers, adminStocks, adminTransactions);
+      await updateDepositStats();
+    } else {
+      NusaToast(res.message || 'Gagal approve deposit', 'error');
+    }
+  } catch (err) {
+    NusaToast('Error: ' + err.message, 'error');
+  }
+};
+
+window.doRejectDeposit = async (depositId) => {
+  const dep = adminDeposits.find(d => d._id === depositId);
+  const ok = await NusaConfirm({
+    title: 'Tolak Deposit?',
+    message: `Deposit sebesar <strong>Rp ${(dep?.amount || 0).toLocaleString('id-ID')}</strong> dari <strong>${dep?.userName || '—'}</strong> akan ditolak.`,
+    danger: true,
+    confirmText: 'Tolak',
+    cancelText: 'Batal'
+  });
+  if (!ok) return;
+
+  try {
+    const res = await API.rejectDeposit(depositId, 'Ditolak oleh admin');
+    if (res.ok) {
+      NusaToast('Deposit telah ditolak', 'warning', 3000);
+      await renderAdminDepositsTable();
+      await updateDepositStats();
+    } else {
+      NusaToast(res.message || 'Gagal menolak deposit', 'error');
+    }
+  } catch (err) {
+    NusaToast('Error: ' + err.message, 'error');
+  }
+};
+
+async function updateDepositStats() {
+  try {
+    const ds = await API.depositStats();
+    const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    const fmt = (n) => 'Rp ' + (n || 0).toLocaleString('id-ID');
+
+    setEl('adminDepositPendingCount',  ds.pendingCount  || 0);
+    setEl('adminDepositPendingTotal',  fmt(ds.pendingTotal));
+    setEl('adminDepositApprovedTotal', fmt(ds.approvedTotal));
+
+    // Badge di sidebar nav
+    const badge = document.querySelector('#adminDepositPendingBadge');
+    if (badge) {
+      badge.textContent = ds.pendingCount || 0;
+      badge.classList.toggle('hidden', !ds.pendingCount);
+    }
+
+    // Shortcut di Finance Summary card
+    const summaryEl = document.getElementById('adminSumDepositPending');
+    if (summaryEl) {
+      summaryEl.textContent = ds.pendingCount
+        ? `${ds.pendingCount} • ${fmt(ds.pendingTotal)}`
+        : 'Tidak ada';
+    }
+  } catch (_) { /* silent — tidak semua halaman punya elemen ini */ }
 }
 
 // Render admin market monitoring — data dari stocks nyata
@@ -1269,16 +1509,6 @@ function renderStocksMonitoring() {
 }
 
 // Global functions for deposits and monitoring
-window.approveDeposit = async (userId) => {
-  const ok = await NusaConfirm({ title: 'Setujui Deposit?', message: `Deposit dari <strong>${userId}</strong> akan disetujui.`, confirmText: 'Setujui' });
-  if (ok) NusaToast(`Deposit dari ${userId} telah disetujui`, 'success');
-};
-
-window.rejectDeposit = async (userId) => {
-  const ok = await NusaConfirm({ title: 'Tolak Deposit?', message: `Deposit dari <strong>${userId}</strong> akan ditolak.`, danger: true, confirmText: 'Tolak' });
-  if (ok) NusaToast(`Deposit dari ${userId} telah ditolak`, 'error');
-};
-
 window.pauseMarket = async (marketName) => {
   const ok = await NusaConfirm({ title: `Pause Market ${marketName}?`, message: 'Semua trading pada indeks ini akan dihentikan sementara.', danger: true, confirmText: 'Pause' });
   if (ok) NusaToast(`Market ${marketName} telah di-pause`, 'warning');
