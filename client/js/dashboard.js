@@ -637,19 +637,43 @@ async function loadAdminDashboard() {
   }
 
   try {
+<<<<<<< HEAD
     // Muat data secara individual agar jika salah satu gagal tidak memblokir yang lain
     const [usersRes, stocksRes, txRes, statsRes] = await Promise.allSettled([
+=======
+    // Check admin role before making API calls
+    const role = localStorage.getItem('role');
+    if (role !== 'admin') {
+      NusaToast('Akses ditolak: Anda bukan admin', 'error');
+      setTimeout(() => { window.location.href = '/index.html'; }, 1500);
+      return;
+    }
+
+    // Muat data paralel untuk kecepatan
+    const [users, stockList, transactions, stats] = await Promise.all([
+>>>>>>> 7371d5d4b6e545e8381cafb7d7cd13b2c1f81117
       API.users(),
       API.stocks(),
       API.transactions(),
       API.stats()
     ]);
 
+<<<<<<< HEAD
     // Ambil nilai atau fallback ke array kosong
     adminUsers        = usersRes.status  === 'fulfilled' && Array.isArray(usersRes.value)  ? usersRes.value  : [];
     adminStocks       = stocksRes.status === 'fulfilled' && Array.isArray(stocksRes.value) ? stocksRes.value : [];
     adminTransactions = txRes.status     === 'fulfilled' && Array.isArray(txRes.value)     ? txRes.value     : [];
     const stats       = statsRes.status  === 'fulfilled' ? statsRes.value : null;
+=======
+    adminUsers = Array.isArray(users) ? users : [];
+    adminStocks = Array.isArray(stockList) ? stockList : [];
+    adminTransactions = Array.isArray(transactions) ? transactions : [];
+
+    // If API returned 403/error for users, show warning
+    if (!Array.isArray(users) && users?.message) {
+      console.warn('API error fetching users:', users.message);
+    }
+>>>>>>> 7371d5d4b6e545e8381cafb7d7cd13b2c1f81117
 
     // Log hasil untuk debugging
     console.log('[Admin] users:', adminUsers.length, '| stocks:', adminStocks.length, '| tx:', adminTransactions.length);
